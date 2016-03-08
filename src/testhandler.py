@@ -16,4 +16,13 @@ class TestHandler(BaseHandler):
             response["body"] = self.request.body.decode()
             self.respond(response, 200)
 
-        # print(json.dumps(self.request.headers))
+
+class TestMultipartHandler(BaseHandler):
+
+    def post(self, *args, **kwargs):
+        file = self.request.files['image'][0]
+        file_name = file["filename"]
+        image = file['body']
+
+        with open('images/' + file_name, 'wb+') as f:
+            f.write(image)
