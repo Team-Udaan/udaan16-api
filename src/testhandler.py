@@ -7,7 +7,7 @@ class TestHandler(BaseHandler):
 
     def post(self, *args, **kwargs):
             response = {}
-            response["headers"] = []
+            response["headers"] = {}
             for header in self.request.headers.get_all():
                 response['headers'].append(header)
 
