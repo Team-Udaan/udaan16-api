@@ -17,6 +17,12 @@ class BaseHandler(RequestHandler):
     def options(self, *args, **kwargs):
         self.send_error(200)
 
+    def get_request_body(self):
+        try:
+            return json.dumps(self.request.body.decode())
+        except Exception as e:
+            self.respond(e, 500)
+
     def respond(self, response, status_code):
         try:
             _response = {}
