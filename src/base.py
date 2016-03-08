@@ -19,7 +19,7 @@ class BaseHandler(RequestHandler):
 
     def get_request_body(self):
         try:
-            return json.dumps(self.request.body.decode())
+            return json.loads(self.request.body.decode())
         except Exception as e:
             self.respond(e, 500)
 

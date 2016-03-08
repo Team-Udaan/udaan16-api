@@ -1,6 +1,6 @@
 import json
 
-from src.basehandler import BaseHandler
+from src.base import BaseHandler
 
 
 class TestHandler(BaseHandler):
