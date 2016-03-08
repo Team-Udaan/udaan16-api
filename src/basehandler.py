@@ -17,8 +17,11 @@ class BaseHandler(RequestHandler):
     def options(self, *args, **kwargs):
         self.send_error(200)
 
-    def respond(self, response):
+    def respond(self, response, status_code):
         try:
-            self.write(json.dumps(response))
+            _response = {}
+            _response["message"] = response
+            _response["status"] = status_code
+            self.write(json.dumps(_response))
         except Exception as err:
             self.write(err)
