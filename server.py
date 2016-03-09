@@ -9,7 +9,7 @@ from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
 from src.test import TestHandler, TestMultipartHandler
 
-define("port", default=8000, help="run on given port", type=int)
+define("port", default=8000, help="run on the given port", type=int)
 
 if __name__ == '__main__':
     client = MotorClient()
