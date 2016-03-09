@@ -5,14 +5,13 @@ from src.base import BaseHandler
 class AlertHandler(BaseHandler):
 
     def send_mail(self, text, image, image_name):
-
         return requests.post(
             "https://api.mailgun.net/v3/sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org/messages",
             auth=("api", "key-a0bd92feef0ccecb07f199b770449917"),
             files=[("inline", image)],
             data={
                 "from": "Mailgun Sandbox <postmaster@sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org>",
-                "to": "Udaan <udaan16developers@gmail.com>",
+                "to": "<list@sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org    >",
                 "subject": "Hello Udaan",
                 "text": text,
                 "html": '<html>Inline image here: <img src="cid:' + image_name + '"></html>'
