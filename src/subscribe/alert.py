@@ -1,3 +1,5 @@
+from email.mime.image import MIMEImage
+
 import requests
 from src.base import BaseHandler
 
@@ -21,18 +23,14 @@ class AlertHandler(BaseHandler):
     def post(self, *args, **kwargs):
         # TODO
         # save the messages to local database
-
         file = self.request.files['image'][0]
         file_name = file["filename"]
         image = file['body']
         text = self.get_argument("text")
         response = self.send_mail(text, image, file_name)
-        if response:
-            response = "email send successfully"
-            status_code = 200
-            self.respond(response,status_code)
+        if response.status_code == 200:
+            msg = "email send successfully"
+            self.respond(msg, response.status_code)
         else:
-            response = "Please try again"
-            status_code = 400
-            self.respond(response, status_code)
-
+            msg = "Please try again"
+            self.respond(msg, response.status_code)

@@ -16,23 +16,24 @@ class SubscribeHander(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
-        # TODO
-        # 1) Add members to mailing lists
         data = self.get_request_body()
         db = self.settings['client'].subscription
-        result = yield db.subscribers.insert({'email': data['email']})
-        if result:
-            self.add_list_member(data['email'])
-            response = 'email-id successfully inserted'
-            # TODO
-            # 1) create list of status codes in basehandlers.
-            status_code = 200
-            self.respond(response, status_code)
+        result = yield db.subscribers.find_one({'email': data['email']})
+        if result is None:
+            response = self.add_list_member(data['email'])
+            if response.status_code == 200:
+                yield db.subscribers.insert({'email': data['email'], 'active': True})
+                msg = 'email-id successfully subscribed'
+                # TODO
+                # create list of status codes in basehandlers.
+                self.respond(msg, response.status_code)
+            else:
+                msg = 'email-id not subscribed'
+                self.respond(msg, response.status_code)
         else:
-            response = 'email-id not inserted'
+            msg = 'user already registered'
             status_code = 400
-            self.respond(response, status_code)
-
+            self.respond(msg, status_code)
 
 
 

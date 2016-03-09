@@ -5,6 +5,7 @@ from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
 from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
+from src.subscribe.unsubscribe import UnsubscribeHandler
 from src.test import TestHandler, TestMultipartHandler
 
 define("port", default=8000, help="run on the given port", type=int)
@@ -15,6 +16,7 @@ if __name__ == '__main__':
     app = Application(handlers=[
         (r"/test", TestHandler),
         (r"/subscribe", SubscribeHander),
+        (r"/unsubscribe/(.*?)", UnsubscribeHandler),
         (r"/alert", AlertHandler),
         (r"/testmultipart", TestMultipartHandler),
         (r"/testmultipart/(.*)", StaticFileHandler, {"path": "images/"})
