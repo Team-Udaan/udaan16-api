@@ -21,7 +21,9 @@ class AlertHandler(BaseHandler):
 
     def post(self, *args, **kwargs):
         # TODO
-        # save the messages to local database
+        # 1) save the messages to local database
+        # 2) Allow users to add subject along with text
+        # 3) Send the mail to mailing lists
         file = self.request.files['image'][0]
         file_name = file["filename"]
         image = file['body']
