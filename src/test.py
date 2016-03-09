@@ -23,6 +23,5 @@ class TestMultipartHandler(BaseHandler):
         file = self.request.files['image'][0]
         file_name = file["filename"]
         image = file['body']
-
         with open('images/' + file_name, 'wb+') as f:
             f.write(image)
