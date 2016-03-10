@@ -14,13 +14,13 @@ if __name__ == '__main__':
     client = MotorClient()
     options.parse_command_line()
     app = Application(handlers=[
-        (r"/test", TestHandler),
-        (r"/subscribe", SubscribeHander),
-        (r"/unsubscribe/(.*?)", UnsubscribeHandler),
-        (r"/alert", AlertHandler),
-        (r"/testsmsdelivery", TestSMSDeliveryHandler),
-        (r"/testmultipart", TestMultipartHandler),
-        (r"/testmultipart/(.*)", StaticFileHandler, {"path": "images/"})
+        (r"/api/test", TestHandler),
+        (r"/api/subscribe", SubscribeHander),
+        (r"/api/unsubscribe/(.*?)", UnsubscribeHandler),
+        (r"/api/alert", AlertHandler),
+        (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
+        (r"/api/testmultipart", TestMultipartHandler),
+        (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"})
     ],
         client=client
     )
