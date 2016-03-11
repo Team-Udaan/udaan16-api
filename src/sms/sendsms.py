@@ -5,6 +5,7 @@ from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
 from src.base import BaseHandler
 
+
 class SendSMS(BaseHandler):
     @coroutine
     def post(self, *args, **kwargs):
@@ -28,11 +29,11 @@ class SendSMS(BaseHandler):
                 message=msg,
                 test=test
             )
-            result = yield db.smsCollection.insert(document)
-            if result is None:
-                self.respond("Internal Server error", 500)
-            else:
+            try:
+                yield db.smsCollection.insert(document)
                 self.respond(sms_id.__str__(), 200)
+            except Exception as e:
+                self.respond(e.__str__(), 500)
         else:
             response = "unable to send"
             self.respond(response, 400)
