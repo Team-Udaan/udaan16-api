@@ -1,3 +1,5 @@
+from urllib import parse
+
 from bson import ObjectId
 from tornado.gen import coroutine
 from src.base import BaseHandler
@@ -7,7 +9,9 @@ class ReportHandler(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
-        data = self.get_request_body()
+        urlencoded_data = self.request.body.decode()
+        str_data = parse.unquote(urlencoded_data)
+        data = dict(item.split('=') for item in str_data.split("&"))
         db = self.settings['client'].smsCollection
         document = dict(
                 status=data['status'],

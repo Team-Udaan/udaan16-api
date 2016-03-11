@@ -21,7 +21,7 @@ class BaseHandler(RequestHandler):
         try:
             return json.loads(self.request.body.decode())
         except Exception as e:
-            self.respond(e, 500)
+            self.respond(str(e), 500)
 
     def respond(self, response, status_code):
         try:
