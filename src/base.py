@@ -25,9 +25,8 @@ class BaseHandler(RequestHandler):
 
     def respond(self, response, status_code):
         try:
-            _response = {}
-            _response["message"] = response
-            _response["status"] = status_code
-            self.write(json.dumps(_response))
+            _response = {"message": response, "status": status_code}
+            data = json.dumps(_response)
+            self.write(data)
         except Exception as err:
             self.write(err)

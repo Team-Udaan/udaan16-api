@@ -3,6 +3,9 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
+
+from src.sms.report import ReportHandler
+from src.sms.sendsms import SendSMS
 from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
 from src.subscribe.unsubscribe import UnsubscribeHandler
@@ -19,6 +22,8 @@ if __name__ == '__main__':
         (r"/api/unsubscribe/(.*?)", UnsubscribeHandler),
         (r"/api/alert", AlertHandler),
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
+        (r"/api/sendsms",SendSMS),
+        (r"/api/report", ReportHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"})
     ],
