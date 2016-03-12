@@ -1,5 +1,7 @@
+
 """This file is the main server file which handles all the http requests and listens on port 8000 by default if nothing
- specified and handles url binding"""
+   specified and handles url binding with appropriate RequestHandlers and spawns the IOLoop"""
+
 
 from motor import MotorClient
 from tornado.httpserver import HTTPServer
@@ -25,7 +27,7 @@ if __name__ == '__main__':
         (r"/api/unsubscribe/(.*?)", UnsubscribeHandler),
         (r"/api/alert", AlertHandler),
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
-        (r"/api/sendsms", SendSMS),
+        (r"/api/sendsms",SendSMS),
         (r"/api/report", ReportHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"})
