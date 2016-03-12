@@ -9,6 +9,11 @@ from src.base import BaseHandler
 class SendSMS(BaseHandler):
     @coroutine
     def post(self, *args, **kwargs):
+        
+        """->This method will be called when a post request on url-/api/sendsms will be made.
+         ->This method will get array of numbers,test,message and it will send the http request to text local API.
+         ->The response received from textlocal will be checked and if successful then it will be stored in database
+           else a reponse with status code 400 is sent."""
         data = self.get_request_body()
         db = self.settings['client'].sms
         msg = data['message']
