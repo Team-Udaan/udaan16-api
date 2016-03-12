@@ -4,7 +4,6 @@ from src.base import BaseHandler
 
 
 class SubscribeHander(BaseHandler):
-
     def add_list_member(self, email_id):
         return requests.post(
             "https://api.mailgun.net/v3/lists/LIST@sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org/members",
@@ -34,7 +33,3 @@ class SubscribeHander(BaseHandler):
             msg = 'user already registered'
             status_code = 400
             self.respond(msg, status_code)
-
-
-
-

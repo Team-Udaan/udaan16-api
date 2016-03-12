@@ -5,9 +5,7 @@ from src.base import BaseHandler
 
 
 class TestHandler(BaseHandler):
-
     def post(self, *args, **kwargs):
-
         response = {}
         response["headers"] = {}
         for header in self.request.headers.get_all():
@@ -20,7 +18,6 @@ class TestHandler(BaseHandler):
 
 
 class TestMultipartHandler(BaseHandler):
-
     def post(self, *args, **kwargs):
         file = self.request.files['image'][0]
         file_name = file["filename"]
@@ -30,7 +27,6 @@ class TestMultipartHandler(BaseHandler):
 
 
 class TestSMSDeliveryHandler(BaseHandler):
-
     def serve(self):
         print(self.request)
         with open("record.txt", "a+") as f:
