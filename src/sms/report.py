@@ -9,9 +9,11 @@ class ReportHandler(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
-        
+
         """It collects the data and stores the status and datetime in database corresponding to the appropriate customID
-        If inserted successfully then a response with status code 200 is sent."""
+        If inserted successfully then a response with status code 200 is sent.
+        :param args:
+        :param kwargs: """
         
         urlencoded_data = self.request.body.decode()
         str_data = parse.unquote(urlencoded_data)
@@ -31,9 +33,10 @@ class ReportHandler(BaseHandler):
 
     @coroutine
     def get(self, *args, **kwargs):
-        
         """This method will be called when the user wants to see the status of sent messages and a response is sent
-        to the user containing all the information regarding the delivery report of appropriate received uid."""
+        to the user containing all the information regarding the delivery report of appropriate received uid.
+        :param kwargs:
+        :param args: """
         
         _id = self.get_argument('uid')
         _id = ObjectId(_id)
