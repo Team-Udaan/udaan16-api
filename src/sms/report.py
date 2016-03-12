@@ -1,5 +1,5 @@
+import json
 from urllib import parse
-
 from bson import ObjectId
 from tornado.gen import coroutine
 from src.base import BaseHandler
@@ -8,30 +8,32 @@ from src.base import BaseHandler
 class ReportHandler(BaseHandler):
 
     @coroutine
-    def post(self, *args, **kwargs):
-        urlencoded_data = self.request.body.decode()
-        str_data = parse.unquote(urlencoded_data)
-        data = dict(item.split('=') for item in str_data.split("&"))
-        db = self.settings['client'].smsCollection
+    def get(self, *args, **kwargs):
+        response = {}
+        data = self._get_arguments("data", self.request.arguments)
+        response["data"] = json.loads(data[0])
+        db = self.settings['client'].sms
         document = dict(
                 status=data['status'],
-                datetime=data['datetime']
+                datetime=data['date']
         )
-        _id = data['customID']
+        _id = response["data"]["reqid"]
         _id = ObjectId(_id)
-        result = yield db.smsCollection.update({"_id": _id}, {"$set": {data["number"]: document}})
-        if result is None:
-            self.write_error(400)
-        else:
-            self.respond("OK", 200)
+        try:
+            yield db.smsCollectionYesha.update({"_id": _id}, {"$set": {"logs": {data["number"]: document}}})
+            self.respond(_id.__str__(), 200)
+        except Exception as e:
+            self.respond(e.__str__(), 500)
+
 
     @coroutine
-    def get(self, *args, **kwargs):
-        _id = self.get_argument('uid')
+    def post(self, *args, **kwargs):
+        data = self.get_request_body()
+        _id = data['_id']
         _id = ObjectId(_id)
-        db = self.settings['client'].smsCollection
-        result = yield db.smsCollection.find_one({"_id":_id})
-        if result is None:
-            self.respond("Please try again",400)
-        else:
+        db = self.settings['client'].sms
+        try:
+            result = yield db.smsCollectionYesha.find_one({"_id":_id})
             self.respond(result, 200)
+        except Exception as e:
+            self.respond(e.__str__(), 500)

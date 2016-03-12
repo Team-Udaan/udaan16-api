@@ -1,9 +1,11 @@
 import json
-from urllib import parse
+
 from bson import ObjectId
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
+
 from src.base import BaseHandler
+
 
 class SendSMS(BaseHandler):
     @coroutine
@@ -12,27 +14,25 @@ class SendSMS(BaseHandler):
         db = self.settings['client'].sms
         msg = data['message']
         numbers = ','.join(map(str, data['numbers']))
-        test = data["test"]
-        sms_id = ObjectId()
-        data = {"username": "anjaras473@gmail.com", "hash": "e2403127a42671bbd3d28192528590589aa52f64",
-                "numbers": numbers, "message": msg, "sender": "TXTLCL", "custom": str(sms_id), 'test': test}
-        request_data = parse.urlencode(data)
         client = AsyncHTTPClient()
-        response = yield client.fetch("http://api.textlocal.in/send/", method='POST', headers=None, body=request_data)
+        response = yield client.fetch("http://msg.yeshasoftware.com/api/sendhttp.php?authkey=10285ArwR3m6OoWte56e11baa"
+                                      "&mobiles=" + numbers + "&message=" + msg + "&sender=YSDEMO&route=4&"
+                                                                                  "country=91&response=json",
+                                      method='GET',
+                                      headers=None)
         response = json.loads(response.body.decode())
-        print(response)
-        if response["status"] == "success":
+        _id = ObjectId(response['message'])
+        if response["type"] == "success":
             document = dict(
-                _id=sms_id,
-                numbers=numbers,
-                message=msg,
-                test=test
+                    _id=_id,
+                    numbers=numbers,
+                    message=msg,
             )
-            result = yield db.smsCollection.insert(document)
-            if result is None:
-                self.respond("Internal Server error", 500)
-            else:
-                self.respond(sms_id.__str__(), 200)
+            try:
+                yield db.smsCollectionYesha.insert(document)
+                self.respond(_id.__str__(), 200)
+            except Exception as e:
+                self.respond(e.__str__(), 500)
         else:
             response = "unable to send"
             self.respond(response, 400)
