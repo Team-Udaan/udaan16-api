@@ -1,3 +1,8 @@
+
+"""This file is the main server file which handles all the http requests and listens on port 8000 by default if nothing
+   specified and handles url binding"""
+
+
 from motor import MotorClient
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
