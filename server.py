@@ -1,6 +1,6 @@
 
 """This file is the main server file which handles all the http requests and listens on port 8000 by default if nothing
-   specified and handles url binding"""
+   specified and handles url binding with appropriate RequestHandlers and spawns the IOLoop"""
 
 
 from motor import MotorClient
