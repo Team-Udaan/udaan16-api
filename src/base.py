@@ -22,8 +22,7 @@ class BaseHandler(RequestHandler):
 
     def get_request_body(self):
         
-        """It will be called everytime a request body is to be converted into dictionary data.
-           It will convert the given request body data into dictionary data and if an exception 
+        """It will convert the request body data into dictionary data and if an exception
            occurs then a response with status code 500 is sent."""
         
         try:

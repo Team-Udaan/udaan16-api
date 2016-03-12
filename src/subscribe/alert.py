@@ -5,7 +5,6 @@ from src.base import BaseHandler
 
 
 class AlertHandler(BaseHandler):
-
     def send_mail(self, text, image, image_name):
         return requests.post(
             "https://api.mailgun.net/v3/sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org/messages",
@@ -17,8 +16,8 @@ class AlertHandler(BaseHandler):
                 "subject": "Hello Udaan",
                 "text": text,
                 "html": '<html>Inline image here: <img src="cid:' + image_name + '"></html>'
-                }
-            )
+            }
+        )
 
     def post(self, *args, **kwargs):
         # TODO

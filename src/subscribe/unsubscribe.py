@@ -6,10 +6,10 @@ from bson.objectid import ObjectId
 
 def remove_member(email):
     return requests.delete(
-            (
-                "https://api.mailgun.net/v3/lists/list@sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org/members/"
-                + email),
-                 auth=('api', 'key-a0bd92feef0ccecb07f199b770449917'))
+        (
+            "https://api.mailgun.net/v3/lists/list@sandbox1713f24a60034b5ab5e7fa0ca2faa9b6.mailgun.org/members/"
+            + email),
+        auth=('api', 'key-a0bd92feef0ccecb07f199b770449917'))
 
 
 class UnsubscribeHandler(BaseHandler):
