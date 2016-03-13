@@ -29,4 +29,4 @@ class BaseHandler(RequestHandler):
             data = json.dumps(_response)
             self.write(data)
         except Exception as err:
-            self.write(err)
+            self.write(err.__str__())

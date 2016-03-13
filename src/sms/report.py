@@ -28,11 +28,12 @@ class ReportHandler(BaseHandler):
     @coroutine
     def post(self, *args, **kwargs):
         data = self.get_request_body()
-        db = self.settings['client'].smsyesha
+        db = self.settings['client'].sms
         _id = data['_id']
         _id = ObjectId(_id)
         try:
-            result = yield db.smsCollection.find_one({"_id":_id})
+            result = yield db.smsCollectionYesha.find_one({"_id":_id})
+            result['_id'] = result['_id'].__str__()
             self.respond(result, 200)
         except Exception as e:
             self.respond(e.__str__(), 500)
