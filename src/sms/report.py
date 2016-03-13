@@ -1,5 +1,4 @@
 import json
-from urllib import parse
 from bson import ObjectId
 from tornado.gen import coroutine
 from src.base import BaseHandler
@@ -29,11 +28,11 @@ class ReportHandler(BaseHandler):
     @coroutine
     def post(self, *args, **kwargs):
         data = self.get_request_body()
+        db = self.settings['client'].smsyesha
         _id = data['_id']
         _id = ObjectId(_id)
-        db = self.settings['client'].sms
         try:
-            result = yield db.smsCollectionYesha.find_one({"_id":_id})
+            result = yield db.smsCollection.find_one({"_id":_id})
             self.respond(result, 200)
         except Exception as e:
             self.respond(e.__str__(), 500)
