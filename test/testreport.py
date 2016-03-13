@@ -16,7 +16,7 @@ class TestReport(TestBaseHandler):
         self.assertEqual(response['status'], 200)
 
     @gen_test
-    def test_login_bad_request(self):
+    def test_report_bad_request(self):
         _id = ObjectId()
         data = {"_id": _id.__str__()}
         body = json.dumps(data)
