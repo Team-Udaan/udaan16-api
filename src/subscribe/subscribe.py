@@ -1,6 +1,4 @@
 from urllib.parse import urlencode
-
-import requests
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 

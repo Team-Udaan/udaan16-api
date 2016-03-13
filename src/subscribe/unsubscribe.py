@@ -1,8 +1,6 @@
-import requests
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from src.base import BaseHandler
-from bson.objectid import ObjectId
 
 
 class UnsubscribeHandler(BaseHandler):
