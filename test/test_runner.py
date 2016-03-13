@@ -14,7 +14,5 @@ test_files = [
     "test.testreport",
 ]
 
-# test_files = ["test." + f.strip(".py") for f in files if not f.startswith("_")]
-
 for f in test_files:
     subprocess.check_output(["python3.4", "-m", "unittest", f], stderr=stdout)
