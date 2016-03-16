@@ -6,6 +6,12 @@ __author__ = 'alay'
 
 class BaseHandler(RequestHandler):
 
+    environmental_variables = dict(
+        TEXTLOCAL_HASH="",
+        TEXTLOCAL_SENDER="",
+        TEXTLOCAL_USERNAME=""
+    )
+
     def initialize(self):
         
         """It will set the given response headers"""
