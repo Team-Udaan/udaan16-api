@@ -24,6 +24,7 @@ class SendSMS(BaseHandler):
         event_name = ""
         date = ""
         time = ""
+        venue = ""
         data = self.get_request_body()
         db = self.settings['client'].sms
         msg = data['message']
@@ -34,9 +35,9 @@ class SendSMS(BaseHandler):
             "username": BaseHandler.environmental_variables["TEXTLOCAL_USERNAME"],
             "hash": BaseHandler.environmental_variables["TEXTLOCAL_HASH"],
             "numbers": numbers,
-            "message": "Dear Participant, Round "+ round_number + " of " + event_name +
+            "message": "Dear Participant, Round " + round_number + " of " + event_name +
                        "is on " + date + " " + time +
-                       " at IEI Cabin.Kindly be present at the venue on time.",
+                       " at " + venue + ".Kindly be present at the venue on time.",
             "sender": BaseHandler.environmental_variables["TEXTLOCAL_SENDER"],
             "custom": str(sms_id),
             'test': test
