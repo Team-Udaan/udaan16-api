@@ -23,3 +23,38 @@ class LoginTestHandler(TestBaseHandler):
         self.assertEqual(response_body["status"], 200)
         document = yield self.get_db_client().udaan.eventCollection.find_one({"email": email})
         self.assertEqual(response_body["message"], str(document["_id"]))
+
+    @gen_test
+    def test_login_invalid_request(self):
+        invalid_email = "invalid@email.com"
+        invalid_email_password = "doesnt matter"
+
+        valid_email = "janitirth17110@gmail.com"
+        valid_email_invalid_password = "invalid"
+
+        invalid_email_data = dict(
+            email=invalid_email,
+            password=invalid_email_password
+        )
+
+        body = json.dumps(invalid_email_data)
+        http_client = AsyncHTTPClient()
+        response = yield http_client.fetch("http://localhost:8000/api/event_management/login", method='POST', headers=None, body=body)
+        response_body = json.loads(response.body.decode())
+
+        self.assertEqual(response.code, 200)
+        self.assertEqual(response_body["status"], 401)
+        self.assertEqual(response_body["message"], "Invalid email id")
+
+        valid_email = dict(
+            email=valid_email,
+            password=valid_email_invalid_password
+        )
+
+        body = json.dumps(valid_email)
+        response = yield http_client.fetch("http://localhost:8000/api/event_management/login", method='POST', headers=None, body=body)
+        response_body = json.loads(response.body.decode())
+
+        self.assertEqual(response.code, 200)
+        self.assertEqual(response_body["status"], 401)
+        self.assertEqual(response_body["message"], "Invalid email id, password combination")

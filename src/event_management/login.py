@@ -29,6 +29,6 @@ class LoginHandler(BaseHandler):
                 # insert token into database
                 self.respond(token, 200)
             else:
-                self.respond("Please try again", 401)
+                self.respond("Invalid email id, password combination", 401)
         else:
-            self.respond("email-id invalid", 400)
+            self.respond("Invalid email id", 401)
