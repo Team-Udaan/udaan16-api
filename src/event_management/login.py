@@ -16,6 +16,10 @@ class LoginHandler(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
+        
+        """This method takes email and password from the request body and matches it with the data stored in database
+        If match occurs then a token along with status code 200 is sent else a error code is sent."""
+        
         data = self.get_request_body()
         db = self.settings['client'].udaan
         email = data['email']
@@ -25,10 +29,8 @@ class LoginHandler(BaseHandler):
             if password == self.hash(email):
                 token = result['_id']
                 token = token.__str__()
-                # TODO
-                # insert token into database
                 self.respond(token, 200)
             else:
-                self.respond("Please try again", 401)
+                self.respond("Email-id Password Combination Invalid", 401)
         else:
-            self.respond("email-id invalid", 400)
+            self.respond("email-id invalid", 401)
