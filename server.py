@@ -9,6 +9,8 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
 
+from src.event_management.login import LoginHandler
+from src.event_management.participants import ParticipantsHandler
 from src.base import BaseHandler
 from src.sms.report import ReportHandler
 from src.sms.sendsms import SendSMS
@@ -20,6 +22,8 @@ from os import environ
 
 
 define("port", default=8000, help="run on the given port", type=int)
+
+client = MotorClient()
 
 
 class Handle(BaseHandler):
@@ -36,6 +40,7 @@ def get_app():
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
         (r"/api/sendsms",SendSMS),
         (r"/api/report", ReportHandler),
+        (r"/api/event_management/login", LoginHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"}),
         (r"/", Handle)
@@ -58,7 +63,6 @@ if __name__ == '__main__':
                 raise SystemExit("Environmental Variables not set")
 
     check_environment_variables()
-    client = MotorClient()
     options.parse_command_line()
     app = get_app()
     http_server = get_http_server(app)
