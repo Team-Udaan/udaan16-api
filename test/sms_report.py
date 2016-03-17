@@ -12,7 +12,7 @@ class TestReport(TestBaseHandler):
     def test_report_valid_request(self):
         client = self.get_db_client()
         number = "9123456789"
-        _id = client.sms.smsCollection.insert({"number": number})
+        _id = yield client.sms.smsCollection.insert({"number": number})
         data = {
             "number": number,
             "customID": _id,
@@ -23,7 +23,7 @@ class TestReport(TestBaseHandler):
         response = yield self.http_client.fetch(self.get_url("/api/report"), method="POST", body=body)
         response = json.loads(response.body.decode())
         self.assertEqual(response['status'], 200)
-        client.sms.smsCollection.remove({"_id": ObjectId(_id)})
+        yield client.sms.smsCollection.remove({"_id": _id})
 
     @gen_test
     def test_report_invalid_request(self):
