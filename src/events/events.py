@@ -10,4 +10,5 @@ class EventsHandler(BaseHandler):
         db = self.settings["client"].udaan
         result = yield db.varunFormattedEvents.find_one()
         del result["_id"]
+        del result["lastModified"]
         self.respond(result, 200)
