@@ -5,6 +5,10 @@ from tornado.testing import AsyncHTTPTestCase, gen_test
 
 
 class TestBaseHandler(AsyncHTTPTestCase):
+
+    def get_db_client(self):
+        return server.client
+
     def get_app(self):
         return server.get_app()
 

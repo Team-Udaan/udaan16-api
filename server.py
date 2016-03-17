@@ -10,7 +10,6 @@ from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
 
 from src.event_management.login import LoginHandler
-from src.event_management.participants import ParticipantsHandler
 from src.base import BaseHandler
 from src.sms.report import ReportHandler
 from src.sms.sendsms import SendSMS

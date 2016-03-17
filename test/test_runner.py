@@ -6,13 +6,10 @@ from os import listdir
 
 test_folder_path = path.dirname(__file__)
 
-files = [f for f in listdir(test_folder_path) if path.isfile(path.join(test_folder_path, f))]
+files = [f.rstrip(".py") for f in listdir(test_folder_path) if path.isfile(path.join(test_folder_path, f))]
 
-test_files = [
-    "test.testbase",
-    "test.handle",
-    "test.testreport",
-]
+files.remove("__init__")
+files.remove("test_runner")
 
-for f in test_files:
+for f in files:
     subprocess.check_output(["python3.4", "-m", "unittest", f], stderr=stdout)

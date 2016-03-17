@@ -1,6 +1,6 @@
 import json
 from tornado.testing import gen_test
-from test.testbase import TestBaseHandler
+from test.base import TestBaseHandler
 
 
 class TestHandler(TestBaseHandler):
