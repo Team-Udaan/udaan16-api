@@ -23,7 +23,7 @@ class LoginHandler(BaseHandler):
         result = yield db.eventCollection.find_one({"email": email})
         if result:
             if password == self.hash(email):
-                token = ObjectId()
+                token = result['_id']
                 token = token.__str__()
                 # TODO
                 # insert token into database
