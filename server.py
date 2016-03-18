@@ -9,6 +9,7 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
 
+from src.event_management.current_round import CurrentRoundHandler
 from src.event_management.login import LoginHandler
 from src.base import BaseHandler
 from src.event_management.participants import ParticipantsHandler
@@ -42,6 +43,7 @@ def get_app():
         (r"/api/report", ReportHandler),
         (r"/api/event_management/login", LoginHandler),
         (r"/api/event_management/participants", ParticipantsHandler),
+        (r"/api/event_management/current_round", CurrentRoundHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"}),
         (r"/", Handle)

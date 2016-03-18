@@ -55,7 +55,7 @@ class ParticipantsHandler(BaseHandler):
             current_round = result['currentRound']
             inserted = yield db.participants.insert(document)
             for i in range(0, current_round + 1):
-                yield db.paricipants.update({"_id": inserted},
+                yield db.participants.update({"_id": inserted},
                                             {"$set": {"round" + str(i): "q"}})
         else:
             self.respond("invalid token", 401)
