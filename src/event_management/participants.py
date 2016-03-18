@@ -8,6 +8,10 @@ from src.base import BaseHandler
 class ParticipantsHandler(BaseHandler):
     @coroutine
     def get(self, *args, **kwargs):
+        
+        """This method will send the list of participants to the manager based on the data sent in request url, if the
+           token is not found in database then a error message is sent."""
+
         db = self.settings['client'].udaan
         url = self.request.uri
         unquoted_url = parse.unquote(url)
@@ -36,6 +40,10 @@ class ParticipantsHandler(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
+        
+        """This method will receive the data from the manager and appropriately make change in the database and also
+        update the corresponding rounds"""
+        
         data = self.get_request_body()
         db = self.settings['client'].udaan
         name = data['names']
@@ -55,7 +63,7 @@ class ParticipantsHandler(BaseHandler):
             current_round = result['currentRound']
             inserted = yield db.participants.insert(document)
             for i in range(0, current_round + 1):
-                yield db.paricipants.update({"_id": inserted},
+                yield db.participants.update({"_id": inserted},
                                             {"$set": {"round" + str(i): "q"}})
         else:
-            self.respond("invalid token", 401)
+            self.respond("Invalid Token", 401)
