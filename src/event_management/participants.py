@@ -1,12 +1,13 @@
 from urllib import parse
 from urllib.parse import parse_qsl
-
 from bson import ObjectId
-
+from tornado.gen import coroutine
 from src.base import BaseHandler
 
 
 class ParticipantsHandler(BaseHandler):
+
+    @coroutine
     def get(self, *args, **kwargs):
         db = self.settings['client'].udaan
         url = self.request.uri
@@ -37,6 +38,7 @@ class ParticipantsHandler(BaseHandler):
         else:
             self.respond("token invalid", 401)
 
+    @coroutine
     def post(self, *args, **kwargs):
         data = self.get_request_body()
         db = self.settings['client'].udaan

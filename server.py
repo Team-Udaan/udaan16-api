@@ -11,6 +11,7 @@ from tornado.options import define, options
 
 from src.event_management.login import LoginHandler
 from src.base import BaseHandler
+from src.event_management.participants import ParticipantsHandler
 from src.sms.report import ReportHandler
 from src.sms.sendsms import SendSMS
 from src.subscribe.alert import AlertHandler
@@ -40,6 +41,7 @@ def get_app():
         (r"/api/sendsms",SendSMS),
         (r"/api/report", ReportHandler),
         (r"/api/event_management/login", LoginHandler),
+        (r"/api/event_management/participants", ParticipantsHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"}),
         (r"/", Handle)
