@@ -57,19 +57,12 @@ class SendSMS(BaseHandler):
         result = yield db.eventCollection.find_one({"_id": token})
         numbers = list()
         if result is not None:
-            # participants_result = db.participants.find({"$and": [{"eventName": result['eventName'],
-            #                                                       "round" + result['currentRound']: "q"}]})
-            # while (yield participants_result.fetch_next):
-            #     document = participants_result.next_object()
-            #     numbers.append(document['mobileNumber'])
-            # for team in teams:
-            #     numbers.append(team['mobileNumber'])
             for team in teams:
-                participants_result = yield db.participants.find({"_id": ObjectId(team['id'])})
+                yield db.participants.find_one({"_id": ObjectId(team['id'])})
                 numbers.append(team['mobileNumber'])
             yield db.eventCollection.update({"_id": result["_id"]}, {"$inc": {"currentRound": 1}})
             result = yield db.eventCollection.find_one({"_id": token})
-            round_number = result['roundNumber']
+            round_number = str(result['roundNumber'])
             event_name = result['event_name']
             numbers = ','.join(map(str, data['numbers']))
             db = self.settings['client'].sms
@@ -88,7 +81,7 @@ class SendSMS(BaseHandler):
                     db = self.settings['client'].udaan
                     for team in teams:
                         yield db.participants.update({"mobileNumber": team['mobileNumber']},
-                                                     {"$set": {"round" + result['currentRound']: "q"}})
+                                                     {"$set": {"round" + round_number: "q"}})
                     self.respond(sms_id.__str__(), 200)
                 except Exception as e:
                     self.respond(e.__str__(), 500)
