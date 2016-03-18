@@ -18,7 +18,7 @@ class ReportHandler(BaseHandler):
         urlencoded_data = self.request.body.decode()
         str_data = parse.unquote(urlencoded_data)
         data = dict(item.split('=') for item in str_data.split("&"))
-        db = self.settings['client'].smsCollection
+        db = self.settings['client'].sms
         document = dict(
                 status=data['status'],
                 datetime=data['datetime']
@@ -26,8 +26,8 @@ class ReportHandler(BaseHandler):
         _id = data['customID']
         _id = ObjectId(_id)
         result = yield db.smsCollection.update({"_id": _id}, {"$set": {data["number"]: document}})
-        if result is None:
-            self.write_error(400)
+        if result["updatedExisting"] is False:
+            self.respond("No such number found", 400)
         else:
             self.respond("OK", 200)
 
@@ -41,8 +41,8 @@ class ReportHandler(BaseHandler):
         _id = self.get_argument('uid')
         _id = ObjectId(_id)
         db = self.settings['client'].smsCollection
-        result = yield db.smsCollection.find_one({"_id":_id})
+        result = yield db.smsCollection.find_one({"_id": _id})
         if result is None:
-            self.respond("Please try again",400)
+            self.respond("Please try again", 400)
         else:
             self.respond(result, 200)

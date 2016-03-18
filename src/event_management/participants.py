@@ -1,9 +1,7 @@
 from urllib import parse
 from urllib.parse import parse_qsl
-
 from bson import ObjectId
 from tornado.gen import coroutine
-
 from src.base import BaseHandler
 
 
@@ -17,25 +15,22 @@ class ParticipantsHandler(BaseHandler):
         parameters = parse_qsl(parsed_url.query)
         parameters = dict(parameters)
         token = parameters['token']
-        round_number = parameters['round']
         token = ObjectId(token)
         result = yield db.eventCollection.find_one({"_id": token})
+        try:
+            round_number = str(parameters['round'])
+            if round_number == "current":
+                round_number = str(result["currentRound"])
+        except KeyError as e:
+            round_number = str(result["currentRound"])
         message = list()
         if result is not None:
-            if round_number == "current":
-                participants = db.participants.find({"round" + str(result['currentRound']): "q"},
-                                                   {"_id": 1, "names": 1, "mobileNumber": 1})
-                while (yield participants.fetch_next):
-                    document = participants.next_object()
-                    message.append(document)
-                self.respond(message, 200)
-            else:
-                participants = db.participants.find({"round" + str(round_number): "q"},
-                                                   {"_id": 1, "names": 1, "mobileNumber": 1})
-                while (yield participants.fetch_next):
-                    document = participants.next_object()
-                    message.append(document)
-                self.respond(message, 200)
+            participants = db.participants.find({"round" + round_number: "q"},
+                                                {"_id": 1, "names": 1, "mobileNumber": 1})
+            while (yield participants.fetch_next):
+                document = participants.next_object()
+                message.append(document)
+            self.respond(message, 200)
         else:
             self.respond("token invalid", 401)
 
@@ -48,12 +43,12 @@ class ParticipantsHandler(BaseHandler):
         token = data['token']
         token = ObjectId(token)
         document = dict(
-                names=name,
-                mobileNumber=mobile_number,
-                round0="NA",
-                round1="NA",
-                round2="NA",
-                round3="NA",
+            names=name,
+            mobileNumber=mobile_number,
+            round0="NA",
+            round1="NA",
+            round2="NA",
+            round3="NA",
         )
         result = yield db.eventCollection.find_one({"_id": token})
         if result is not None:

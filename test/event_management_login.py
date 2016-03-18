@@ -11,6 +11,7 @@ class LoginTestHandler(TestBaseHandler):
     def test_login_valid_request(self):
         email = "janitirth17110@gmail.com"
         password = sha256(sha256(email.encode()).hexdigest()[0:6].encode()).hexdigest()[0:6]
+        # password = '2b615c'
         data = dict(
             email=email,
             password=password

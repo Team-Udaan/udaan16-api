@@ -3,11 +3,10 @@ from urllib import parse
 from bson import ObjectId
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
-
 from src.base import BaseHandler
 
 
-class SendSMS(BaseHandler):
+class SendSMSHandler(BaseHandler):
     # username =
     # sender =
     # hash =

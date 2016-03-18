@@ -13,7 +13,7 @@ from src.event_management.login import LoginHandler
 from src.base import BaseHandler
 from src.event_management.participants import ParticipantsHandler
 from src.sms.report import ReportHandler
-from src.sms.sendsms import SendSMS
+from src.sms.sendsms import SendSMSHandler
 from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
 from src.subscribe.unsubscribe import UnsubscribeHandler
@@ -38,7 +38,7 @@ def get_app():
         (r"/api/unsubscribe/(.*?)", UnsubscribeHandler),
         (r"/api/alert", AlertHandler),
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
-        (r"/api/sendsms",SendSMS),
+        (r"/api/sendsms", SendSMSHandler),
         (r"/api/report", ReportHandler),
         (r"/api/event_management/login", LoginHandler),
         (r"/api/event_management/participants", ParticipantsHandler),
