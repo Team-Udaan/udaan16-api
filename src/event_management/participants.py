@@ -20,7 +20,7 @@ class ParticipantsHandler(BaseHandler):
         token = ObjectId(token)
         result = yield db.eventCollection.find_one({"_id": token})
         message = list()
-        if result:
+        if result is not None:
             if round_number == "current":
                 participants = db.paricipants.find({"round" + result['currentRound']: "q"},
                                                    {"_id": 1, "names": 1, "mobileNumber": 1})
@@ -45,17 +45,28 @@ class ParticipantsHandler(BaseHandler):
         username = data['username']
         mobile_number = data['mobileNumber']
         token = data['token']
+        round_number = data['round']
         token = ObjectId(token)
         result = yield db.eventCollection.find_one({"_id": token})
-        if result:
-            document = dict(
-                    name=username,
-                    mobileNumber=mobile_number,
-                    round=result['currentRound'],
-                    round1="q",
-                    round2="q",
-                    round3="n/a",
-            )
+        if result is not None:
+            if round == 1:
+                document = dict(
+                        name=username,
+                        mobileNumber=mobile_number,
+                        round=result['currentRound'],
+                        round1="q",
+                        round2="n/a",
+                        round3="n/a",
+                )
+            if round_number == 2:
+                document = dict(
+                        name=username,
+                        mobileNumber=mobile_number,
+                        round=result['currentRound'],
+                        round1="q",
+                        round2="q",
+                        round3="n/a",
+                )
             insert_result = db.paricipants.insert(document)
             if insert_result:
                 self.respond(insert_result.__str__(), 200)

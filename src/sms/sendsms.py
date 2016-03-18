@@ -1,6 +1,5 @@
 import json
 from urllib import parse
-
 from bson import ObjectId
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
@@ -12,6 +11,28 @@ class SendSMS(BaseHandler):
     # username =
     # sender =
     # hash =
+
+    def get_message(self, round_number, event_name, date, time, venue):
+        message = "Dear Participant, Round " + round_number + " of " + event_name + "is on " + date + " " + time + \
+                  " at " + venue + ".Kindly be present at the venue on time."
+        return message
+
+    def send_textlocal_sms(self, message, numbers, sms_id, test=True):
+        data = {
+            "username": BaseHandler.environmental_variables["TEXTLOCAL_USERNAME"],
+            "hash": BaseHandler.environmental_variables["TEXTLOCAL_HASH"],
+            "numbers": numbers,
+            "message": message,
+            "sender": BaseHandler.environmental_variables["TEXTLOCAL_SENDER"],
+            "custom": str(sms_id),
+            'test': test
+        }
+        request_data = parse.urlencode(data)
+        client = AsyncHTTPClient()
+        response = yield client.fetch("http://api.textlocal.in/send/", method='POST', headers=None,
+                                      body=request_data)
+        response = json.loads(response.body.decode())
+        return response
 
     @coroutine
     def post(self, *args, **kwargs):
@@ -32,38 +53,29 @@ class SendSMS(BaseHandler):
         venue = data['venue']
         test = data['test']
         token = ObjectId(token)
+
         result = yield db.eventCollection.find_one({"_id": token})
-        update = yield db.eventCollection.update({"_id": token}, {"$inc": {"currentRound": 1}})
         numbers = list()
-        if result:
+        if result is not None:
+            # participants_result = db.participants.find({"$and": [{"eventName": result['eventName'],
+            #                                                       "round" + result['currentRound']: "q"}]})
+            # while (yield participants_result.fetch_next):
+            #     document = participants_result.next_object()
+            #     numbers.append(document['mobileNumber'])
+            # for team in teams:
+            #     numbers.append(team['mobileNumber'])
             for team in teams:
-                participants_result = yield db.participants.update({"mobileNumber": team['mobileNumber']},
-                                                                   {"$set": {"round": result['currentRound'],
-                                                                             "round" + result['currentRound']: "q"}}
-                                                                   )
-                numbers.append(participants_result['mobileNumber'])
-            round_number = result['currentRound']
+                participants_result = yield db.participants.find({"_id": ObjectId(team['id'])})
+                numbers.append(team['mobileNumber'])
+            yield db.eventCollection.update({"_id": result["_id"]}, {"$inc": {"currentRound": 1}})
+            result = yield db.eventCollection.find_one({"_id": token})
+            round_number = result['roundNumber']
             event_name = result['event_name']
             numbers = ','.join(map(str, data['numbers']))
             db = self.settings['client'].sms
             sms_id = ObjectId()
-            data = {
-                "username": BaseHandler.environmental_variables["TEXTLOCAL_USERNAME"],
-                "hash": BaseHandler.environmental_variables["TEXTLOCAL_HASH"],
-                "numbers": numbers,
-                "message": "Dear Participant, Round " + round_number + " of " + event_name +
-                           "is on " + date + " " + time +
-                           " at " + venue + ".Kindly be present at the venue on time.",
-                "sender": BaseHandler.environmental_variables["TEXTLOCAL_SENDER"],
-                "custom": str(sms_id),
-                'test': test
-            }
-            request_data = parse.urlencode(data)
-            client = AsyncHTTPClient()
-            response = yield client.fetch("http://api.textlocal.in/send/", method='POST', headers=None,
-                                          body=request_data)
-            response = json.loads(response.body.decode())
-            print(response, data)
+            response = self.send_textlocal_sms(self.get_message(round_number, event_name, date, time, venue),
+                                               numbers, sms_id)
             if response["status"] == "success":
                 document = dict(
                         _id=sms_id,
@@ -73,6 +85,10 @@ class SendSMS(BaseHandler):
                 )
                 try:
                     yield db.smsCollection.insert(document)
+                    db = self.settings['client'].udaan
+                    for team in teams:
+                        yield db.participants.update({"mobileNumber": team['mobileNumber']},
+                                                     {"$set": {"round" + result['currentRound']: "q"}})
                     self.respond(sms_id.__str__(), 200)
                 except Exception as e:
                     self.respond(e.__str__(), 500)
