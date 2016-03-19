@@ -11,7 +11,9 @@ class ParticipantsHandler(BaseHandler):
     def get(self, *args, **kwargs):
 
         """This method will send the list of participants to the manager based on the data sent in request url, if the
-           token is not found in database then a error message is sent."""
+           token is not found in database then a error message is sent.
+           :param kwargs:
+           :param args: """
 
         db = self.settings['client'].udaan
         url = self.request.uri
@@ -45,8 +47,10 @@ class ParticipantsHandler(BaseHandler):
     @coroutine
     def post(self, *args, **kwargs):
 
-        """This method will receive the data from the manager and appropriately make change in the database and also
-        update the corresponding rounds"""
+        """This method will receive the data from the manager to add on the sport participants entry
+        and appropriately make change in the database and also update the corresponding rounds
+        :param kwargs:
+        :param args: """
 
         data = self.get_request_body()
         db = self.settings['client'].udaan
