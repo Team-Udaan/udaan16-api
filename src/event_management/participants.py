@@ -6,6 +6,7 @@ from src.base import BaseHandler
 
 
 class ParticipantsHandler(BaseHandler):
+
     @coroutine
     def get(self, *args, **kwargs):
         db = self.settings['client'].udaan
@@ -29,6 +30,9 @@ class ParticipantsHandler(BaseHandler):
                                                 {"_id": 1, "names": 1, "mobileNumber": 1})
             while (yield participants.fetch_next):
                 document = participants.next_object()
+                # TODO
+                # remove this in production
+                document["_id"] = str(document["_id"])
                 message.append(document)
             self.respond(message, 200)
         else:
@@ -56,6 +60,6 @@ class ParticipantsHandler(BaseHandler):
             inserted = yield db.participants.insert(document)
             for i in range(0, current_round + 1):
                 yield db.participants.update({"_id": inserted},
-                                            {"$set": {"round" + str(i): "q"}})
+                                             {"$set": {"round" + str(i): "q"}})
         else:
             self.respond("invalid token", 401)

@@ -7,15 +7,14 @@ from src.base import BaseHandler
 
 
 class SendSMSHandler(BaseHandler):
-    # username =
-    # sender =
-    # hash =
 
     def get_message(self, round_number, event_name, date, time, venue):
-        message = "Dear Participant, Round " + round_number + " of " + event_name + "is on " + date + " " + time + \
-                  " at " + venue + ".Kindly be present at the venue on time."
+
+        message = "Dear Participant, Round " + round_number + " of " + event_name + " is on " + date + " " + time + \
+                  " at " + venue + ". Kindly be present at the venue on time."
         return message
 
+    @coroutine
     def send_textlocal_sms(self, message, numbers, sms_id, test=True):
         data = {
             "username": BaseHandler.environmental_variables["TEXTLOCAL_USERNAME"],
@@ -30,6 +29,7 @@ class SendSMSHandler(BaseHandler):
         client = AsyncHTTPClient()
         response = yield client.fetch("http://api.textlocal.in/send/", method='POST', headers=None,
                                       body=request_data)
+        # print(response)
         response = json.loads(response.body.decode())
         return response
 
@@ -42,11 +42,16 @@ class SendSMSHandler(BaseHandler):
            else a reponse with status code 400 is sent.
            :param args:
            :param kwargs: """
+
+        # TODO
+        # add restriction for max round sms.
+        # handle exceptions with transactions
+
         db = self.settings['client'].udaan
         data = self.get_request_body()
         token = data['token']
         teams = data['teams']
-        message = data['message']
+        # message = data['message']
         date = data['date']
         time = data['time']
         venue = data['venue']
@@ -57,17 +62,19 @@ class SendSMSHandler(BaseHandler):
         numbers = list()
         if result is not None:
             for team in teams:
-                yield db.participants.find_one({"_id": ObjectId(team['id'])})
+                yield db.participants.find_one({"_id": ObjectId(team['_id'])})
                 numbers.append(team['mobileNumber'])
             yield db.eventCollection.update({"_id": result["_id"]}, {"$inc": {"currentRound": 1}})
             result = yield db.eventCollection.find_one({"_id": token})
-            round_number = str(result['roundNumber'])
-            event_name = result['event_name']
-            numbers = ','.join(map(str, data['numbers']))
+            round_number = str(result['currentRound'])
+            event_name = result['eventName']
+            numbers = ','.join(map(str, numbers))
             db = self.settings['client'].sms
             sms_id = ObjectId()
-            response = self.send_textlocal_sms(self.get_message(round_number, event_name, date, time, venue),
-                                               numbers, sms_id)
+            message = self.get_message(round_number, event_name, date, time, venue)
+            response = yield self.send_textlocal_sms(message, numbers, sms_id, test)
+            # print(response)
+            # response = json.loads(response.body.decode())
             if response["status"] == "success":
                 document = dict(
                         _id=sms_id,

@@ -10,7 +10,7 @@ class CurrentRoundHandler(BaseHandler):
         db = self.settings['client'].udaan
         token = self.get_argument('token')
         token = ObjectId(token)
-        result = yield db.participants.find_one({"_id": token})
+        result = yield db.eventCollection.find_one({"_id": token})
         if result is not None:
             self.respond(str(result['currentRound']), 200)
         else:
