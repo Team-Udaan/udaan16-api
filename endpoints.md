@@ -8,7 +8,6 @@
 | Endpoint      | Request                                             | Response                               |
 |:--------------|:---------------------------------------------------:|:--------------------------------------:|
 |/login         |POST<br>Body Keylist [username, password]            | On success<br>{"status": 200, "token"} |
-|/participants  |POST Keylist[names, mobileNumber]                    |On success<br>{"status": 200, "id"}     |
-|/participants  |GET<br> urlencoded keys [token, {round}]             |On success<br>{"status": 200, "message":[{id, names, mobileNumber}]}|
-|/sendsms       |POST<br>Body Keylist[token, teams[id, receipt_id, names, mobileNumber], message]|On success<br>{"status": 200, "message": "Smses sent and teams promoted"}|
-
+|/participants  |POST Keylist[token, names, mobileNumber]                    |On success<br>{"status": 200, "id"}     |
+|/participants  |GET<br> urlencoded keys [token, {round}]             |On success<br>{"status": 200, "message":[{_id, names, mobileNumber, receiptId}]}|
+|/sendsms       |POST<br>Body Keylist[token, teams[id, receipt_id, names, mobileNumber], date, time, venue]|On success<br>{"status": 200, "message": "Smses sent and teams promoted"}|

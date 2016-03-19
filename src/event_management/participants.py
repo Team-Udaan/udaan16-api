@@ -1,12 +1,13 @@
 from urllib import parse
 from urllib.parse import parse_qsl
-from bson import ObjectId
 from tornado.gen import coroutine
 from src.base import BaseHandler
+from src.event_management.authenticate import authenticate
 
 
 class ParticipantsHandler(BaseHandler):
 
+    @authenticate
     @coroutine
     def get(self, *args, **kwargs):
 
@@ -15,35 +16,34 @@ class ParticipantsHandler(BaseHandler):
            :param kwargs:
            :param args: """
 
-        db = self.settings['client'].udaan
+        # TODO
+        # add receiptId to the parameters
+        # remove count and setting of participants["receiptId"] in production
+
         url = self.request.uri
         unquoted_url = parse.unquote(url)
         parsed_url = parse.urlparse(unquoted_url)
         parameters = parse_qsl(parsed_url.query)
         parameters = dict(parameters)
-        token = parameters['token']
-        token = ObjectId(token)
-        result = yield db.eventCollection.find_one({"_id": token})
         try:
             round_number = str(parameters['round'])
             if round_number == "current":
-                round_number = str(result["currentRound"])
+                round_number = str(self.result["currentRound"])
         except KeyError as e:
-            round_number = str(result["currentRound"])
-        message = list()
-        if result is not None:
-            participants = db.participants.find({"round" + round_number: "q"},
-                                                {"_id": 1, "names": 1, "mobileNumber": 1})
-            while (yield participants.fetch_next):
-                document = participants.next_object()
-                # TODO
-                # remove this in production
-                document["_id"] = str(document["_id"])
-                message.append(document)
-            self.respond(message, 200)
-        else:
-            self.respond("token invalid", 401)
+            round_number = str(self.result["currentRound"])
+        participants = list()
+        participants_cursor = self.db.participants.find({"round" + round_number: "q"},
+                                                        {"_id": 1, "names": 1, "mobileNumber": 1})
+        count = 0
+        while (yield participants_cursor.fetch_next):
+            participant = participants_cursor.next_object()
+            participant["_id"] = str(participant["_id"])
+            participant["receiptId"] = "TH" + str(count)
+            count += 1
+            participants.append(participant)
+        self.respond(participants, 200)
 
+    @authenticate
     @coroutine
     def post(self, *args, **kwargs):
 
@@ -52,26 +52,18 @@ class ParticipantsHandler(BaseHandler):
         :param kwargs:
         :param args: """
 
-        data = self.get_request_body()
-        db = self.settings['client'].udaan
-        name = data['names']
-        mobile_number = data['mobileNumber']
-        token = data['token']
-        token = ObjectId(token)
+        data = self.parse_request_body()
         document = dict(
-            names=name,
-            mobileNumber=mobile_number,
+            names=data["names"],
+            mobileNumber=data["mobile_number"],
             round0="NA",
             round1="NA",
             round2="NA",
             round3="NA",
         )
-        result = yield db.eventCollection.find_one({"_id": token})
-        if result is not None:
-            current_round = result['currentRound']
-            inserted = yield db.participants.insert(document)
-            for i in range(0, current_round + 1):
-                yield db.participants.update({"_id": inserted},
-                                             {"$set": {"round" + str(i): "q"}})
-        else:
-            self.respond("Invalid Token", 401)
+        current_round = int(self.result['currentRound'])
+        for i in range(0, current_round + 1):
+            document["round"+str(i)] = "q"
+        inserted = yield self.db.participants.insert(document)
+        if inserted is not None:
+            self.respond(str(inserted["_id"]), 200)
