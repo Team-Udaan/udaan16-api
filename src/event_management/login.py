@@ -25,7 +25,7 @@ class LoginHandler(BaseHandler):
         db = self.settings['client'].udaan
         email = data['email']
         password = data['password']
-        result = yield db.eventCollection.find_one({"email": email})
+        result = yield db.events.find_one({"email": email})
         if result:
             if password == get_password(email):
                 token = result['_id']

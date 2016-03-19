@@ -28,9 +28,9 @@ class ParticipantsHandler(BaseHandler):
         try:
             round_number = str(parameters['round'])
             if round_number == "current":
-                round_number = str(self.result["currentRound"])
+                round_number = str(int(self.result["currentRound"]))
         except KeyError as e:
-            round_number = str(self.result["currentRound"])
+            round_number = str(int(self.result["currentRound"]))
         participants = list()
         participants_cursor = self.db.participants.find({"round" + round_number: "q"},
                                                         {"_id": 1, "names": 1, "mobileNumber": 1})
@@ -52,10 +52,9 @@ class ParticipantsHandler(BaseHandler):
         :param kwargs:
         :param args: """
 
-        data = self.parse_request_body()
         document = dict(
-            names=data["names"],
-            mobileNumber=data["mobile_number"],
+            names=self.get_json_body_argument("names"),
+            mobileNumber=self.get_json_body_argument("mobileNumber"),
             round0="NA",
             round1="NA",
             round2="NA",
@@ -66,4 +65,4 @@ class ParticipantsHandler(BaseHandler):
             document["round"+str(i)] = "q"
         inserted = yield self.db.participants.insert(document)
         if inserted is not None:
-            self.respond(str(inserted["_id"]), 200)
+            self.respond(str(inserted), 200)

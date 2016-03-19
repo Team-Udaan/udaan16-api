@@ -4,18 +4,36 @@ from bson import ObjectId
 from tornado.gen import coroutine
 from tornado.httpclient import AsyncHTTPClient
 from src.base import BaseHandler
+from src.event_management.authenticate import authenticate
+
+
+def get_round_message(round_number, event_name, date, time, venue):
+    """
+
+    :param round_number:
+    :param event_name:
+    :param date:
+    :param time:
+    :param venue:
+    :return:
+    """
+    message = "Dear Participant, Round " + round_number + " of " + event_name + " is on " + date + " " + time + \
+              " at " + venue + ". Kindly be present at the venue on time."
+    return message
 
 
 class SendSMSHandler(BaseHandler):
 
-    def get_message(self, round_number, event_name, date, time, venue):
-
-        message = "Dear Participant, Round " + round_number + " of " + event_name + " is on " + date + " " + time + \
-                  " at " + venue + ". Kindly be present at the venue on time."
-        return message
-
     @coroutine
     def send_textlocal_sms(self, message, numbers, sms_id, test=True):
+        """
+
+        :param message:
+        :param numbers:
+        :param sms_id:
+        :param test:
+        :return:
+        """
         data = {
             "username": BaseHandler.environmental_variables["TEXTLOCAL_USERNAME"],
             "hash": BaseHandler.environmental_variables["TEXTLOCAL_HASH"],
@@ -29,10 +47,10 @@ class SendSMSHandler(BaseHandler):
         client = AsyncHTTPClient()
         response = yield client.fetch("http://api.textlocal.in/send/", method='POST', headers=None,
                                       body=request_data)
-        # print(response)
         response = json.loads(response.body.decode())
         return response
 
+    @authenticate
     @coroutine
     def post(self, *args, **kwargs):
 
@@ -47,53 +65,40 @@ class SendSMSHandler(BaseHandler):
         # add restriction for max round sms.
         # handle exceptions with transactions
 
-        db = self.settings['client'].udaan
-        data = self.get_request_body()
-        token = data['token']
+        data = self.parse_request_body()
         teams = data['teams']
-        # message = data['message']
-        date = data['date']
-        time = data['time']
-        venue = data['venue']
-        test = data['test']
-        token = ObjectId(token)
 
-        result = yield db.eventCollection.find_one({"_id": token})
-        numbers = list()
-        if result is not None:
-            for team in teams:
-                yield db.participants.find_one({"_id": ObjectId(team['_id'])})
-                numbers.append(team['mobileNumber'])
-            yield db.eventCollection.update({"_id": result["_id"]}, {"$inc": {"currentRound": 1}})
-            result = yield db.eventCollection.find_one({"_id": token})
-            round_number = str(result['currentRound'])
-            event_name = result['eventName']
-            numbers = ','.join(map(str, numbers))
-            db = self.settings['client'].sms
-            sms_id = ObjectId()
-            message = self.get_message(round_number, event_name, date, time, venue)
-            response = yield self.send_textlocal_sms(message, numbers, sms_id, test)
-            # print(response)
-            # response = json.loads(response.body.decode())
-            if response["status"] == "success":
-                document = dict(
-                        _id=sms_id,
-                        numbers=numbers,
-                        message=message,
-                        test=test
-                )
-                try:
-                    yield db.smsCollection.insert(document)
-                    db = self.settings['client'].udaan
-                    for team in teams:
-                        yield db.participants.update({"mobileNumber": team['mobileNumber']},
-                                                     {"$set": {"round" + round_number: "q"}})
-                    self.respond(sms_id.__str__(), 200)
-                except Exception as e:
-                    self.respond(e.__str__(), 500)
-            else:
-                response = "unable to send"
-                self.respond(response, 400)
+        # TODO
+        # make default False in production
 
+        test = self.get_json_body_argument("test", default=True)
+        numbers = [team["mobileNumber"] for team in teams]
+        numbers_str_list = ','.join(map(str, numbers))
+        round_number = str(int(self.result['currentRound']) + 1)
+        sms_id = ObjectId()
+        message = get_round_message(
+            round_number,
+            self.result['eventName'],
+            self.get_json_body_argument('date'),
+            self.get_json_body_argument('time'),
+            self.get_json_body_argument('venue')
+        )
+        response = yield self.send_textlocal_sms(message, numbers_str_list, sms_id, test)
+        if response["status"] == "success":
+            document = dict(
+                    _id=sms_id,
+                    numbers=numbers,
+                    message=message,
+                    test=test
+            )
+            try:
+                yield self.db.events.update({"_id": self.result["_id"]}, {"$inc": {"currentRound": 1}})
+                yield self.db.sms.insert(document)
+                for team in teams:
+                    yield self.db.participants.update({"mobileNumber": team['mobileNumber']},
+                                                      {"$set": {"round" + round_number: "q"}})
+                self.respond(sms_id.__str__(), 200)
+            except Exception as e:
+                self.respond(e.__str__(), 500)
         else:
-            self.respond("token invalid", 401)
+            self.respond(response, 400)
