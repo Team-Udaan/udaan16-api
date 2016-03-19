@@ -32,7 +32,8 @@ class ParticipantsHandler(BaseHandler):
         except KeyError as e:
             round_number = str(int(self.result["currentRound"]))
         participants = list()
-        participants_cursor = self.db.participants.find({"round" + round_number: "q"},
+        participants_cursor = self.db.participants.find({"round" + round_number: "q",
+                                                        "eventName": self.result["eventName"]},
                                                         {"_id": 1, "names": 1, "mobileNumber": 1})
         count = 0
         while (yield participants_cursor.fetch_next):
