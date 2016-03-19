@@ -16,6 +16,10 @@ class LoginHandler(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
+
+        """This method takes email and password from the request body and matches it with the data stored in database
+        If match occurs then a token along with status code 200 is sent else a error code is sent."""
+
         data = self.get_request_body()
         db = self.settings['client'].udaan
         email = data['email']
