@@ -56,6 +56,7 @@ class ParticipantsHandler(BaseHandler):
         document = dict(
             names=self.get_json_body_argument("names"),
             mobileNumber=self.get_json_body_argument("mobileNumber"),
+            eventName=self.result["eventName"],
             round0="NA",
             round1="NA",
             round2="NA",
