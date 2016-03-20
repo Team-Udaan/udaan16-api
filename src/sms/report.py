@@ -18,13 +18,14 @@ class ReportHandler(BaseHandler):
         urlencoded_data = self.request.body.decode()
         str_data = parse.unquote(urlencoded_data)
         data = dict(item.split('=') for item in str_data.split("&"))
-        document = dict(
-                status=data['status'],
-                datetime=data['datetime']
-        )
+        print(data)
+        # document = dict(
+        #         status=data['status'],
+        #         datetime=data['datetime']
+        # )
         _id = data['customID']
         _id = ObjectId(_id)
-        result = yield self.db.sms.update({"_id": _id}, {"$set": {data["number"]: document}})
+        result = yield self.db.sms.update({"_id": _id}, {"$set": {"log": data}})
         if result["updatedExisting"] is False:
             self.respond("No such number found", 400)
         else:
