@@ -1,8 +1,6 @@
 from urllib import parse
-
 from bson import ObjectId
 from tornado.gen import coroutine
-
 from src.base import BaseHandler
 from src.event_management.authenticate import authenticate
 
@@ -19,20 +17,17 @@ class ReportHandler(BaseHandler):
         urlencoded_data = self.request.body.decode()
         str_data = parse.unquote(urlencoded_data)
         data = dict(item.split('=') for item in str_data.split("&"))
-        print(data)
-        # document = dict(
-        #         status=data['status'],
-        #         datetime=data['datetime']
-        # )
         custom_id_list = str(data['customID']).split("_")
         str_id, round_number = custom_id_list[0], custom_id_list[1]
         _id = ObjectId(str_id)
-        number = str(data["number"]).lstrip("91")
-        del data["number"]
-        del data["customID"]
+        # TODO
+        # remove this in production
+        print(str_id, round_number)
+        number = str(data['number'])[-10:]
+        del data["number"], data["customID"]
         self.result = yield self.db.events.find_one({"_id": _id})
         result = yield self.db.participants.update({"eventName": self.result["eventName"], "round" + round_number: "q",
-                                                    "mobileNumber": number}, {"$set": {"smsStatus": data}})
+                                                    "mobileNumber": int(number)}, {"$set": {"smsStatus": data}})
         if result["updatedExisting"] is False:
             self.respond("No such number found", 400)
         else:
