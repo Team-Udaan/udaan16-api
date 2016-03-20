@@ -25,12 +25,12 @@ def get_round_message(round_number, event_name, date, time, venue):
 class SendSMSHandler(BaseHandler):
 
     @coroutine
-    def send_textlocal_sms(self, message, numbers, sms_id, test=True):
+    def send_textlocal_sms(self, message, numbers, round_number, test=True):
         """
 
+        :param round_number:
         :param message:
         :param numbers:
-        :param sms_id:
         :param test:
         :return:
         """
@@ -40,7 +40,8 @@ class SendSMSHandler(BaseHandler):
             "numbers": numbers,
             "message": message,
             "sender": BaseHandler.environmental_variables["TEXTLOCAL_SENDER"],
-            "custom": str(sms_id),
+            "custom": self.result["_id"].__str__() + "_" + round_number,
+            # "custom": str(sms_id),
             'test': test
         }
         request_data = parse.urlencode(data)
@@ -72,7 +73,8 @@ class SendSMSHandler(BaseHandler):
         # make default False in production
 
         test = self.get_json_body_argument("test", default=True)
-        numbers = [team["mobileNumber"] for team in teams]
+        numbers = {str(team["mobileNumber"]): "" for team in teams}
+        print(numbers)
         numbers_str_list = ','.join(map(str, numbers))
         round_number = str(int(self.result['currentRound']) + 1)
         sms_id = ObjectId()
@@ -83,12 +85,14 @@ class SendSMSHandler(BaseHandler):
             self.get_json_body_argument('time'),
             self.get_json_body_argument('venue')
         )
-        response = yield self.send_textlocal_sms(message, numbers_str_list, sms_id, test)
+        response = yield self.send_textlocal_sms(message, numbers_str_list, round_number, test)
         if response["status"] == "success":
             document = dict(
                     _id=sms_id,
                     numbers=numbers,
                     message=message,
+                    eventId=self.result["_id"],
+                    round=round_number,
                     test=test
             )
             try:

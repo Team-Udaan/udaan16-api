@@ -34,7 +34,7 @@ class ParticipantsHandler(BaseHandler):
         participants = list()
         participants_cursor = self.db.participants.find({"round" + round_number: "q",
                                                         "eventName": self.result["eventName"]},
-                                                        {"_id": 1, "names": 1, "mobileNumber": 1})
+                                                        {"_id": 1, "names": 1, "mobileNumber": 1, "smsStatus": 1})
         count = 0
         while (yield participants_cursor.fetch_next):
             participant = participants_cursor.next_object()
