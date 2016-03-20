@@ -22,7 +22,7 @@ class LoginTestHandler(TestBaseHandler):
         response_body = json.loads(response.body.decode())
         self.assertEqual(response.code, 200)
         self.assertEqual(response_body["status"], 200)
-        document = yield self.get_db_client().udaan.eventCollection.find_one({"email": email})
+        document = yield self.get_db_client().udaan.events.find_one({"email": email})
         self.assertEqual(response_body["message"], str(document["_id"]))
 
     @gen_test
@@ -58,4 +58,4 @@ class LoginTestHandler(TestBaseHandler):
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response_body["status"], 401)
-        self.assertEqual(response_body["message"], "Invalid email id, password combination")
+        self.assertEqual(response_body["message"], "Invalid email id")

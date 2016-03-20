@@ -95,7 +95,7 @@ class SendSMSHandler(BaseHandler):
                 yield self.db.events.update({"_id": self.result["_id"]}, {"$inc": {"currentRound": 1}})
                 yield self.db.sms.insert(document)
                 for team in teams:
-                    yield self.db.participants.update({"mobileNumber": team['mobileNumber']},
+                    yield self.db.participants.update({"_id": ObjectId(team["_id"])},
                                                       {"$set": {"round" + round_number: "q"}})
                 self.respond(sms_id.__str__(), 200)
             except Exception as e:
