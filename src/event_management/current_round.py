@@ -8,4 +8,5 @@ class CurrentRoundHandler(BaseHandler):
     @authenticate
     @coroutine
     def get(self, *args, **kwargs):
-        self.respond(str(int(self.result["currentRound"])))
+        self.respond(str(int(self.result["currentRound"])), 200)
+
