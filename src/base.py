@@ -57,8 +57,7 @@ class BaseHandler(RequestHandler):
             if default is not None:
                 return default
             else:
-                self.respond("The key " + key + " is missing in request body", 400)
-                self.finish()
+                raise Exception("The key " + key + " is missing in request body")
 
     def respond(self, response, status_code):
 

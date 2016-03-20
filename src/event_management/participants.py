@@ -42,6 +42,8 @@ class ParticipantsHandler(BaseHandler):
             participant["receiptId"] = "TH" + str(count)
             if "smsStatus" in participant:
                 participant["smsStatus"] = participant["smsStatus"]["status"]
+            else:
+                participant.setdefault("smsStatus", "NA")
             count += 1
             participants.append(participant)
         self.respond(participants, 200)
@@ -54,19 +56,21 @@ class ParticipantsHandler(BaseHandler):
         and appropriately make change in the database and also update the corresponding rounds
         :param kwargs:
         :param args: """
-
-        document = dict(
-            names=self.get_json_body_argument("names"),
-            mobileNumber=self.get_json_body_argument("mobileNumber"),
-            eventName=self.result["eventName"],
-            round0="NA",
-            round1="NA",
-            round2="NA",
-            round3="NA",
-        )
-        current_round = int(self.result['currentRound'])
-        for i in range(0, current_round + 1):
-            document["round"+str(i)] = "q"
-        inserted = yield self.db.participants.insert(document)
-        if inserted is not None:
-            self.respond(str(inserted), 200)
+        try:
+            document = dict(
+                names=self.get_json_body_argument("names"),
+                mobileNumber=self.get_json_body_argument("mobileNumber"),
+                eventName=self.result["eventName"],
+                round0="NA",
+                round1="NA",
+                round2="NA",
+                round3="NA",
+            )
+            current_round = int(self.result['currentRound'])
+            for i in range(0, current_round + 1):
+                document["round"+str(i)] = "q"
+            inserted = yield self.db.participants.insert(document)
+            if inserted is not None:
+                self.respond(str(inserted), 200)
+        except Exception as i:
+            self.respond(i.__str__(), 400)

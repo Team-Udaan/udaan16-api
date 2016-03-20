@@ -65,44 +65,44 @@ class SendSMSHandler(BaseHandler):
         # TODO
         # add restriction for max round sms.
         # handle exceptions with transactions
+        try:
+            teams = self.get_json_body_argument("teams")
 
-        data = self.parse_request_body()
-        teams = data['teams']
+            # TODO
+            # make default False in production
 
-        # TODO
-        # make default False in production
-
-        test = self.get_json_body_argument("test", default=True)
-        numbers = {str(team["mobileNumber"]): "" for team in teams}
-        print(numbers)
-        numbers_str_list = ','.join(map(str, numbers))
-        round_number = str(int(self.result['currentRound']) + 1)
-        sms_id = ObjectId()
-        message = get_round_message(
-            round_number,
-            self.result['eventName'],
-            self.get_json_body_argument('date'),
-            self.get_json_body_argument('time'),
-            self.get_json_body_argument('venue')
-        )
-        response = yield self.send_textlocal_sms(message, numbers_str_list, round_number, test)
-        if response["status"] == "success":
-            document = dict(
-                    _id=sms_id,
-                    numbers=numbers,
-                    message=message,
-                    eventId=self.result["_id"],
-                    round=round_number,
-                    test=test
+            test = self.get_json_body_argument("test", default=True)
+            numbers = [team["mobileNumber"] for team in teams]
+            numbers_str_list = ','.join(map(str, numbers))
+            round_number = str(int(self.result['currentRound']) + 1)
+            sms_id = ObjectId()
+            message = get_round_message(
+                round_number,
+                self.result['eventName'],
+                self.get_json_body_argument('date'),
+                self.get_json_body_argument('time'),
+                self.get_json_body_argument('venue')
             )
-            try:
-                yield self.db.events.update({"_id": self.result["_id"]}, {"$inc": {"currentRound": 1}})
-                yield self.db.sms.insert(document)
-                for team in teams:
-                    yield self.db.participants.update({"_id": ObjectId(team["_id"])},
-                                                      {"$set": {"round" + round_number: "q"}})
-                self.respond(sms_id.__str__(), 200)
-            except Exception as e:
-                self.respond(e.__str__(), 500)
-        else:
-            self.respond(response, 400)
+            response = yield self.send_textlocal_sms(message, numbers_str_list, round_number, test)
+            if response["status"] == "success":
+                document = dict(
+                        _id=sms_id,
+                        numbers=numbers,
+                        message=message,
+                        eventId=self.result["_id"],
+                        round=round_number,
+                        test=test
+                )
+                try:
+                    yield self.db.events.update({"_id": self.result["_id"]}, {"$inc": {"currentRound": 1}})
+                    yield self.db.sms.insert(document)
+                    for team in teams:
+                        yield self.db.participants.update({"_id": ObjectId(team["_id"])},
+                                                          {"$set": {"round" + round_number: "q"}})
+                    self.respond(sms_id.__str__(), 200)
+                except Exception as e:
+                    self.respond(e.__str__(), 500)
+            else:
+                self.respond(response, 400)
+        except Exception as e:
+            self.respond(e.__str__(), 400)
