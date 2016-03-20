@@ -22,7 +22,6 @@ class ReportHandler(BaseHandler):
         _id = ObjectId(str_id)
         # TODO
         # remove this in production
-        print(str_id, round_number)
         number = str(data['number'])[-10:]
         del data["number"], data["customID"]
         self.result = yield self.db.events.find_one({"_id": _id})
