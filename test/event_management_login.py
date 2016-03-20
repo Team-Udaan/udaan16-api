@@ -58,4 +58,4 @@ class LoginTestHandler(TestBaseHandler):
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response_body["status"], 401)
-        self.assertEqual(response_body["message"], "Invalid email id")
+        self.assertEqual(response_body["message"], "Invalid email id, password combination")
