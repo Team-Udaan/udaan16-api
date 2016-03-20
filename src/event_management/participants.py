@@ -40,6 +40,7 @@ class ParticipantsHandler(BaseHandler):
             participant = participants_cursor.next_object()
             participant["_id"] = str(participant["_id"])
             participant["receiptId"] = "TH" + str(count)
+            participant["smsStatus"] = participant["smsStatus"]["status"]
             count += 1
             participants.append(participant)
         self.respond(participants, 200)
