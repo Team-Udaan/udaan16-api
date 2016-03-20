@@ -1,3 +1,5 @@
+import traceback
+
 from tornado.web import RequestHandler
 import json
 
@@ -26,6 +28,33 @@ class BaseHandler(RequestHandler):
         self._parsed = False
         self.result = dict()
         self.db = self.settings["client"].udaan
+
+    def write_error(self, status_code, **kwargs):
+        """Override to implement custom error pages.
+
+        ``write_error`` may call `write`, `render`, `set_header`, etc
+        to produce output as usual.
+
+        If this error was caused by an uncaught exception (including
+        HTTPError), an ``exc_info`` triple will be available as
+        ``kwargs["exc_info"]``.  Note that this exception may not be
+        the "current" exception for purposes of methods like
+        ``sys.exc_info()`` or ``traceback.format_exc``.
+        """
+        if self.settings.get("serve_traceback") and "exc_info" in kwargs:
+            # in debug mode, try to send a traceback
+            self.set_header('Content-Type', 'text/plain')
+            for line in traceback.format_exception(*kwargs["exc_info"]):
+                self.write(line)
+            self.finish()
+        else:
+            self.set_header('Content-Type', 'application/json')
+            self.set_header("Access-Control-Allow-Origin", "*")
+            # self.set_header("Access-Control-Allow-Credentials", "false")
+            self.set_header("Access-Control-Expose-Headers", "*")
+            self.set_header("Access-Control-Allow-Methods", "*")
+            self.set_header("Access-Control-Allow-Headers", "accept, authorization")
+            self.finish()
 
     def set_result(self, result):
         self.result = result
