@@ -11,4 +11,4 @@
 |/login         |POST<br>Body Keylist [username, password]            | On success<br>{"status": 200, "token"} |
 |/participants  |POST Keylist[names, mobileNumber]                    |On success<br>{"status": 200, "id"}     |
 |/participants  |GET<br> urlencoded keys [{round}]             |On success<br>{"status": 200, "message":[{_id, names, mobileNumber, receiptId, smsStatus}]}|
-|/sendsms       |POST<br>Body Keylist[teams[id, receipt_id, names, mobileNumber], date, time, venue]|On success<br>{"status": 200, "message": "Smses sent and teams promoted"}|
+|/sendsms       |POST<br>Body Keylist[teams[_id, receiptId, names, mobileNumber], date, time, venue]|On success<br>{"status": 200, "message": "Smses sent and teams promoted"}|

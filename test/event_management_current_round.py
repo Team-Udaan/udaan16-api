@@ -1,7 +1,4 @@
-import json
-
 from bson import ObjectId
-from tornado.httpclient import AsyncHTTPClient
 from tornado.testing import gen_test
 from test.base import TestBaseHandler
 
@@ -19,39 +16,36 @@ class CurrentRoundTestHandler(TestBaseHandler):
 
         event_id = yield db.events.insert(event)
         str_event_id = str(event_id)
-        http_client = AsyncHTTPClient()
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/current_round", method="GET",
-                                           headers=dict(Authorization=str_event_id))
-        response_body = json.loads(response.body.decode())
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 200)
-        self.assertEqual(response_body["message"], str(current_round))
-
+        expected_response = dict(
+            code=200,
+            body=dict(
+                status=200,
+                message=str(current_round)
+            )
+        )
+        yield self.check("/api/event_management/current_round", method="GET",
+                         headers=dict(Authorization=str_event_id), expected_response=expected_response)
         current_round += 1
-
+        expected_response["body"]["message"] = str(current_round)
         yield db.events.update({"_id": event_id}, {"$inc": {"currentRound": 1}})
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/current_round", method="GET",
-                                           headers=dict(Authorization=str_event_id))
-        response_body = json.loads(response.body.decode())
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 200)
-        self.assertEqual(response_body["message"], str(current_round))
-
+        yield self.check("/api/event_management/current_round", method="GET",
+                         headers=dict(Authorization=str_event_id), expected_response=expected_response)
         yield db.events.remove({"_id": event_id})
 
     @gen_test
     def test_get_current_round_invalid_request(self):
-        http_client = AsyncHTTPClient()
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/current_round", method="GET",
-                                           headers=None)
-        response_body = json.loads(response.body.decode())
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 403)
-        self.assertEqual(response_body["message"], "Forbidden")
+        expected_response = dict(
+            code=200,
+            body=dict(
+                status=403,
+                message="Forbidden"
+            )
+        )
+        yield self.check("/api/event_management/current_round", method="GET",
+                         headers=None, expected_response=expected_response)
 
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/current_round", method="GET",
-                                           headers=dict(Authorization=ObjectId().__str__()))
-        response_body = json.loads(response.body.decode())
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 401)
-        self.assertEqual(response_body["message"], "Invalid Token")
+        expected_response["body"]["status"] = 401
+        expected_response["body"]["message"] = "Invalid Token"
+        yield self.check("/api/event_management/current_round", method="GET",
+                         headers=dict(Authorization=ObjectId().__str__()),
+                         expected_response=expected_response)
