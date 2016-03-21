@@ -53,6 +53,8 @@ def get_app():
         client=client
     )
 
+port = options.port
+
 
 def get_http_server(application):
     return HTTPServer(application)
