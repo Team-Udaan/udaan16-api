@@ -9,7 +9,7 @@ class SubscribeHander(BaseHandler):
 
     @coroutine
     def post(self, *args, **kwargs):
-        data = self.get_request_body()
+        data = self.parse_request_body()
         db = self.settings['client'].subscription
         email = data['email']
         result = yield db.subscribers.find_one({'email': email})

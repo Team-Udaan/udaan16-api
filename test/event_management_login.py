@@ -11,6 +11,7 @@ class LoginTestHandler(TestBaseHandler):
     def test_login_valid_request(self):
         email = "janitirth17110@gmail.com"
         password = sha256(sha256(email.encode()).hexdigest()[0:6].encode()).hexdigest()[0:6]
+        # password = '2b615c'
         data = dict(
             email=email,
             password=password
@@ -21,7 +22,7 @@ class LoginTestHandler(TestBaseHandler):
         response_body = json.loads(response.body.decode())
         self.assertEqual(response.code, 200)
         self.assertEqual(response_body["status"], 200)
-        document = yield self.get_db_client().udaan.eventCollection.find_one({"email": email})
+        document = yield self.get_db_client().udaan.events.find_one({"email": email})
         self.assertEqual(response_body["message"], str(document["_id"]))
 
     @gen_test
