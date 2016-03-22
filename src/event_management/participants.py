@@ -32,25 +32,28 @@ class ParticipantsHandler(BaseHandler):
         except KeyError as e:
             round_number = str(int(self.result["currentRound"]))
         participants = list()
-        participants_cursor = self.db.participants.find({"round" + round_number: "q",
-                                                        "eventName": self.result["eventName"]},
-                                                        {"_id": 1, "names": 1, "mobileNumber": 1, "smsStatus": 1})
-        count = 0
-        while (yield participants_cursor.fetch_next):
-            participant = participants_cursor.next_object()
-            participant["_id"] = str(participant["_id"])
-            participant["receiptId"] = "TH" + str(count)
-            if "smsStatus" in participant:
-                participant["smsStatus"] = participant["smsStatus"]["status"]
-            else:
-                participant.setdefault("smsStatus", "NA")
-            count += 1
-            participants.append(participant)
-        message = dict(
-            participants=participants,
-            eventName=self.result["eventName"]
-        )
-        self.respond(message, 200)
+        if int(round_number) > self.result['currentRound']:
+            self.respond("No such round found", 400)
+        else:
+            participants_cursor = self.db.participants.find({"round" + round_number: "q",
+                                                            "eventName": self.result["eventName"]},
+                                                            {"_id": 1, "names": 1, "mobileNumber": 1, "smsStatus": 1})
+            count = 0
+            while (yield participants_cursor.fetch_next):
+                participant = participants_cursor.next_object()
+                participant["_id"] = str(participant["_id"])
+                participant["receiptId"] = "TH" + str(count)
+                if "smsStatus" in participant:
+                    participant["smsStatus"] = participant["smsStatus"]["status"]
+                else:
+                    participant.setdefault("smsStatus", "NA")
+                count += 1
+                participants.append(participant)
+            message = dict(
+                participants=participants,
+                eventName=self.result["eventName"]
+            )
+            self.respond(message, 200)
 
     @authenticate
     @coroutine
