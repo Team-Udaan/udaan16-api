@@ -1,5 +1,4 @@
 import traceback
-
 from tornado.web import RequestHandler
 import json
 
@@ -54,7 +53,11 @@ class BaseHandler(RequestHandler):
             self.set_header("Access-Control-Expose-Headers", "*")
             self.set_header("Access-Control-Allow-Methods", "*")
             self.set_header("Access-Control-Allow-Headers", "accept, authorization")
-            self.finish()
+            self._status_code = 200
+            self.finish(json.dumps(dict(
+                code=status_code,
+                message=kwargs.get("exc_info").__str__()
+            )))
 
     def set_result(self, result):
         self.result = result

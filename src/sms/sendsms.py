@@ -41,7 +41,6 @@ class SendSMSHandler(BaseHandler):
             "message": message,
             "sender": BaseHandler.environmental_variables["TEXTLOCAL_SENDER"],
             "custom": self.result["_id"].__str__() + "_" + round_number,
-            # "custom": str(sms_id),
             'test': test
         }
         request_data = parse.urlencode(data)
