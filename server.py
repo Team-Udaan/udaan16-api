@@ -43,6 +43,8 @@ def get_app():
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
         (r"/api/sendsms", SendSMSHandler),
         (r"/api/report", ReportHandler),
+        (r"/api/events", EventsHandler),
+        (r"/api/lastModified", LastModifiedHandler),
         (r"/api/event_management/login", LoginHandler),
         (r"/api/event_management/participants", ParticipantsHandler),
         (r"/api/event_management/current_round", CurrentRoundHandler),

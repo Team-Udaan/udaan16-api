@@ -1,5 +1,4 @@
 import json
-from tornado.httpclient import AsyncHTTPClient
 from tornado.testing import gen_test
 from test.base import TestBaseHandler
 from hashlib import sha256
@@ -9,7 +8,7 @@ class LoginTestHandler(TestBaseHandler):
 
     @gen_test
     def test_login_valid_request(self):
-        db = self.get_db_client().udaan
+        # db = self.get_db_client().udaan
         email = "janitirth17110@gmail.com"
         password = sha256(sha256(email.encode()).hexdigest()[0:6].encode()).hexdigest()[0:6]
         # password = '2b615c'
