@@ -46,7 +46,11 @@ class ParticipantsHandler(BaseHandler):
                 participant.setdefault("smsStatus", "NA")
             count += 1
             participants.append(participant)
-        self.respond(participants, 200)
+        message = dict(
+            participants=participants,
+            eventName=self.result["eventName"]
+        )
+        self.respond(message, 200)
 
     @authenticate
     @coroutine

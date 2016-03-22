@@ -6,8 +6,10 @@ from test.base import TestBaseHandler
 class TestHandler(TestBaseHandler):
     @gen_test
     def test_handler(self):
-        response = yield self.http_client.fetch(self.get_url("/"))
-        self.assertEqual(response.code, 200)
-        body = response.body.decode()
-        response = json.loads(body)
-        self.assertEqual(response['status'], 200)
+        expected_response=dict(
+            code=200,
+            body=dict(
+                status=200
+            )
+        )
+        self.check("/",method="GET",headers=None,expected_response=expected_response)

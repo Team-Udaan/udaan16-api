@@ -38,9 +38,9 @@ class TestBaseHandler(AsyncHTTPTestCase):
     #         )})
 
     @coroutine
-    def check(self, path, method, headers, expected_response):
+    def check(self, path, method, headers, expected_response, body=None):
         http_client = self.get_http_client()
-        response = yield http_client.fetch(self.get_url(path), method=method, headers=headers)
+        response = yield http_client.fetch(self.get_url(path), method=method, headers=headers,body=body)
         self.assertEqual(response.code, expected_response["code"])
         response_body = json.loads(response.body.decode())
         self.assertEqual(response_body, expected_response["body"])

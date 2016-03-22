@@ -9,6 +9,7 @@ class LoginTestHandler(TestBaseHandler):
 
     @gen_test
     def test_login_valid_request(self):
+        db = self.get_db_client().udaan
         email = "janitirth17110@gmail.com"
         password = sha256(sha256(email.encode()).hexdigest()[0:6].encode()).hexdigest()[0:6]
         # password = '2b615c'
@@ -16,14 +17,18 @@ class LoginTestHandler(TestBaseHandler):
             email=email,
             password=password
         )
-        body = json.dumps(data)
-        http_client = AsyncHTTPClient()
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/login", method='POST', headers=None, body=body)
-        response_body = json.loads(response.body.decode())
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 200)
         document = yield self.get_db_client().udaan.events.find_one({"email": email})
-        self.assertEqual(response_body["message"], str(document["_id"]))
+        expected_response = dict(
+            code=200,
+            body=dict(
+                status=200,
+                message=str(document["_id"])
+
+            )
+        )
+        body = json.dumps(data)
+        yield self.check("/api/event_management/login", method="POST", headers= None,
+                         expected_response=expected_response, body=body)
 
     @gen_test
     def test_login_invalid_request(self):
@@ -37,25 +42,29 @@ class LoginTestHandler(TestBaseHandler):
             email=invalid_email,
             password=invalid_email_password
         )
-
+        expected_response_invalid_email = dict(
+            code=200,
+            body=dict(
+                status=401,
+                message="Invalid email id"
+            )
+        )
         body = json.dumps(invalid_email_data)
-        http_client = AsyncHTTPClient()
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/login", method='POST', headers=None, body=body)
-        response_body = json.loads(response.body.decode())
-
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 401)
-        self.assertEqual(response_body["message"], "Invalid email id")
+        yield self.check("/api/event_management/login", method="POST", headers=None,
+                         expected_response=expected_response_invalid_email, body=body)
 
         valid_email = dict(
             email=valid_email,
             password=valid_email_invalid_password
         )
-
+        expected_response_valid_email = dict(
+            code=200,
+            body=dict(
+                status=401,
+                message="Invalid email id, password combination"
+            )
+        )
         body = json.dumps(valid_email)
-        response = yield http_client.fetch("http://localhost:8000/api/event_management/login", method='POST', headers=None, body=body)
-        response_body = json.loads(response.body.decode())
+        yield self.check("/api/event_management/login", method="POST", headers=None,
+                         expected_response=expected_response_valid_email, body=body)
 
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response_body["status"], 401)
-        self.assertEqual(response_body["message"], "Invalid email id, password combination")

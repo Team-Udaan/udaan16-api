@@ -9,4 +9,3 @@ class CurrentRoundHandler(BaseHandler):
     @coroutine
     def get(self, *args, **kwargs):
         self.respond(str(int(self.result["currentRound"])), 200)
-

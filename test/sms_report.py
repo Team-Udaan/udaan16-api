@@ -1,7 +1,8 @@
-import json
 from datetime import datetime
 from urllib.parse import urlencode
+
 from tornado.testing import gen_test
+
 from test.base import TestBaseHandler
 
 
@@ -18,10 +19,16 @@ class TestReport(TestBaseHandler):
             "status": "D",
             "datetime": datetime.now().timestamp()
         }
+        expected_response = dict(
+                code=200,
+                body=dict(
+                        status=200,
+                        message="OK"
+                )
+        )
         body = urlencode(data)
-        response = yield self.http_client.fetch(self.get_url("/api/report"), method="POST", body=body)
-        response = json.loads(response.body.decode())
-        self.assertEqual(response['status'], 200)
+        yield self.check("/api/report", method="POST", headers=None, expected_response=expected_response,
+                         body=body)
         yield client.event.remove({"_id": event_id})
         yield client.participants.remove({"_id": _id})
 
@@ -37,9 +44,13 @@ class TestReport(TestBaseHandler):
             "status": "D",
             "datetime": datetime.now().timestamp()
         }
+        expexted_response = dict(
+                code=200,
+                body=dict(
+                        status=400,
+                        message="No such number found"
+                )
+        )
         body = urlencode(data)
-        response = yield self.http_client.fetch(self.get_url("/api/report"), method="POST", body=body)
-        response = json.loads(response.body.decode())
-        self.assertEqual(response['status'], 400)
-        yield client.event.remove({"_id": event_id})
-        yield client.participants.remove({"_id": _id})
+        self.check("/api/report", method="POST", headers=None,
+                   expected_response=expexted_response, body=body)
