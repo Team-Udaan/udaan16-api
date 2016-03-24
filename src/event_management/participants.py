@@ -80,4 +80,4 @@ class ParticipantsHandler(BaseHandler):
             if inserted is not None:
                 self.respond(str(inserted), 200)
         except Exception as i:
-            self.respond(i.__str__(), 400)
+            self.respond(i.__str__(), 500)
