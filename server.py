@@ -8,15 +8,14 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
-
 from src.event_management.current_round import CurrentRoundHandler
 from src.event_management.login import LoginHandler
 from src.base import BaseHandler
+from src.event_management.promote import PromoteHandler
 from src.events.events import EventsHandler
 from src.events.last_modified import LastModifiedHandler
 from src.event_management.participants import ParticipantsHandler
 from src.sms.report import ReportHandler
-from src.sms.sendsms import SendSMSHandler
 from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
 from src.subscribe.unsubscribe import UnsubscribeHandler
@@ -41,7 +40,7 @@ def get_app():
         (r"/api/unsubscribe/(.*?)", UnsubscribeHandler),
         (r"/api/alert", AlertHandler),
         (r"/api/testsmsdelivery", TestSMSDeliveryHandler),
-        (r"/api/sendsms", SendSMSHandler),
+        (r"/api/event_management/promote", PromoteHandler),
         (r"/api/report", ReportHandler),
         (r"/api/events", EventsHandler),
         (r"/api/events/lastModified", LastModifiedHandler),
