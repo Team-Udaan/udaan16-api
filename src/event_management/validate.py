@@ -13,6 +13,12 @@ SCHEMA = {
                 "mobileNumber": {
                     "type": "integer",
                     "required": True
+                },
+                "receiptId": {
+                    "type": "string"
+                },
+                "names": {
+                    "type": "string"
                 }
             }
         }
@@ -31,7 +37,6 @@ SCHEMA = {
     },
     "test": {
         "type": "boolean",
-        "required": True
     }
 }
 
