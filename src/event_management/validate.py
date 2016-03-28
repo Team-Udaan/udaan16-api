@@ -37,6 +37,10 @@ SCHEMA = {
     },
     "test": {
         "type": "boolean",
+    },
+    "currentRound": {
+        "type": "integer",
+        "required": True
     }
 }
 

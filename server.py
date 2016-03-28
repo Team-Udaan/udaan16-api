@@ -1,31 +1,33 @@
 
 """This file is the main server file which handles all the http requests and listens on port 8000 by default if nothing
    specified and handles url binding with appropriate RequestHandlers and spawns the IOLoop"""
-
+from os import environ
 
 from motor import MotorClient
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from tornado.web import Application, StaticFileHandler
 from tornado.options import define, options
-from src.event_management.current_round import CurrentRoundHandler
-from src.event_management.login import LoginHandler
+from tornado.web import Application, StaticFileHandler
+
 from src.base import BaseHandler
+from src.event_management.current_round import CurrentRoundHandler
+from src.event_management.instruction import InstructionHandler
+from src.event_management.login import LoginHandler
+from src.event_management.participants import ParticipantsHandler
 from src.event_management.promote import PromoteHandler
 from src.events.events import EventsHandler
 from src.events.last_modified import LastModifiedHandler
-from src.event_management.participants import ParticipantsHandler
+from src.loader import load_instructions
 from src.sms.report import ReportHandler
 from src.subscribe.alert import AlertHandler
 from src.subscribe.subscribe import SubscribeHander
 from src.subscribe.unsubscribe import UnsubscribeHandler
 from src.test import TestHandler, TestMultipartHandler, TestSMSDeliveryHandler
-from os import environ
-
 
 define("port", default=8000, help="run on the given port", type=int)
 
 client = MotorClient()
+load_instructions()
 
 
 class Handle(BaseHandler):
@@ -47,6 +49,7 @@ def get_app():
         (r"/api/event_management/login", LoginHandler),
         (r"/api/event_management/participants", ParticipantsHandler),
         (r"/api/event_management/current_round", CurrentRoundHandler),
+        (r"/api/event_management/instruction", InstructionHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"}),
         (r"/", Handle)

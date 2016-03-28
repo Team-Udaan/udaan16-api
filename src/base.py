@@ -1,6 +1,8 @@
-import traceback
-from tornado.web import RequestHandler
 import json
+import traceback
+from datetime import datetime
+from tornado.gen import coroutine
+from tornado.web import RequestHandler
 
 __author__ = 'alay'
 
@@ -12,6 +14,18 @@ class BaseHandler(RequestHandler):
         TEXTLOCAL_SENDER="",
         TEXTLOCAL_USERNAME=""
     )
+
+    @coroutine
+    def prepare(self):
+        self.start_time = datetime.now().timestamp()
+        request = dict(self.request.__dict__.items())
+        headers = dict(self.request.headers.__dict__.items())
+        request = dict(
+            uri=request["uri"],
+            body=request["body"],
+            headers=headers["_dict"]
+        )
+        self.log_id = yield self.db.logger.insert({"request": request})
 
     def initialize(self):
 
@@ -27,6 +41,8 @@ class BaseHandler(RequestHandler):
         self._parsed = False
         self.result = dict()
         self.db = self.settings["client"].udaan
+        self.log_id = None
+        self._response = None
 
     def write_error(self, status_code, **kwargs):
         """Override to implement custom error pages.
@@ -39,6 +55,7 @@ class BaseHandler(RequestHandler):
         ``kwargs["exc_info"]``.  Note that this exception may not be
         the "current" exception for purposes of methods like
         ``sys.exc_info()`` or ``traceback.format_exc``.
+        :param status_code:
         """
         if self.settings.get("serve_traceback") and "exc_info" in kwargs:
             # in debug mode, try to send a traceback
@@ -100,8 +117,18 @@ class BaseHandler(RequestHandler):
            :param response: response message of the response object"""
 
         try:
-            _response = {"message": response, "status": status_code}
-            data = json.dumps(_response)
+            self._response = {"message": response, "status": status_code}
+            data = json.dumps(self._response)
             self.write(data)
         except Exception as err:
             self.write(err.__str__())
+
+    @coroutine
+    def on_finish(self):
+        end_time = datetime.now().timestamp()
+        serve_time = end_time - self.start_time
+        yield self.db.logger.update({"_id": self.log_id},
+                                    {"$set": {"response": self._response,
+                                              "serveTime": serve_time,
+                                              "request.body": self.body
+                                              }})
