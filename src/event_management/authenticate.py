@@ -6,6 +6,10 @@ from tornado.gen import coroutine
 
 
 def authenticate(function):
+
+    """This function is for the decorator @authenticate, all the users logging in would be verified with the database
+    entries if not found then they a error will be sent."""
+
     @coroutine
     @wraps(function)
     def wrapper(self, *args, **kwargs):
