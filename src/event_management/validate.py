@@ -46,6 +46,10 @@ SCHEMA = {
 
 
 def validator(data):
+
+    """This method will be called to validate the format of the request sent to the api, if an unappropriate request
+    comes then a error message with missing details is sent as response."""
+
     request_validator = cerberus.Validator(SCHEMA)
     if request_validator.validate(data):
         return True
