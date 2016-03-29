@@ -1,9 +1,8 @@
 from tornado.gen import coroutine
-
 from src.base import BaseHandler
 
 
-class InstructionHandler(BaseHandler):
+class InstructionsHandler(BaseHandler):
 
     @coroutine
     def get(self, *args, **kwargs):

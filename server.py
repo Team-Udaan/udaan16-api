@@ -11,7 +11,7 @@ from tornado.web import Application, StaticFileHandler
 
 from src.base import BaseHandler
 from src.event_management.current_round import CurrentRoundHandler
-from src.event_management.instruction import InstructionHandler
+from src.event_management.instruction import InstructionsHandler
 from src.event_management.login import LoginHandler
 from src.event_management.participants import ParticipantsHandler
 from src.event_management.promote import PromoteHandler
@@ -25,10 +25,9 @@ from src.subscribe.unsubscribe import UnsubscribeHandler
 from src.test import TestHandler, TestMultipartHandler, TestSMSDeliveryHandler
 
 define("port", default=8000, help="run on the given port", type=int)
+define("instructions", default="instruction.md", help="give the file path of instructions.md", type=str)
 
 client = MotorClient()
-load_instructions()
-
 
 class Handle(BaseHandler):
     def get(self, *args, **kwargs):
@@ -49,7 +48,7 @@ def get_app():
         (r"/api/event_management/login", LoginHandler),
         (r"/api/event_management/participants", ParticipantsHandler),
         (r"/api/event_management/current_round", CurrentRoundHandler),
-        (r"/api/event_management/instruction", InstructionHandler),
+        (r"/api/event_management/instructions", InstructionsHandler),
         (r"/api/testmultipart", TestMultipartHandler),
         (r"/api/testmultipart/(.*)", StaticFileHandler, {"path": "images/"}),
         (r"/", Handle)
@@ -64,6 +63,9 @@ def get_http_server(application):
     return HTTPServer(application)
 
 if __name__ == '__main__':
+
+    filename = options.instrustions
+    load_instructions(filename)
 
     def check_environment_variables():
         for key in BaseHandler.environmental_variables.keys():
