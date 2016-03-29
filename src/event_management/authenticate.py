@@ -1,7 +1,5 @@
 from functools import wraps
-
 from bson import ObjectId
-from bson.errors import InvalidId
 from tornado.gen import coroutine
 
 

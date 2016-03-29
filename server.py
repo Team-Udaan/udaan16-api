@@ -24,8 +24,8 @@ from src.subscribe.subscribe import SubscribeHander
 from src.subscribe.unsubscribe import UnsubscribeHandler
 from src.test import TestHandler, TestMultipartHandler, TestSMSDeliveryHandler
 
-define("port", default=8000, help="run on the given port", type=int)
-define("instructions", default="instruction.md", help="give the file path of instructions.md", type=str)
+define(name="port", default=8000, help="run on the given port", type=int)
+define(name="instructions", default="instructions.md", help="give the file path of instructions.md", type=str)
 
 client = MotorClient()
 
@@ -57,6 +57,7 @@ def get_app():
     )
 
 port = options.port
+filename = options.instructions
 
 
 def get_http_server(application):
@@ -64,7 +65,6 @@ def get_http_server(application):
 
 if __name__ == '__main__':
 
-    filename = options.instrustions
     load_instructions(filename)
 
     def check_environment_variables():
