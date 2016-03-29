@@ -7,4 +7,4 @@ def load_instructions(filename):
     with open(filename, "r") as file:
         content = file.read()
     db.instrunctions.remove()
-    db.instrunctions.insert({"instruction": content})
+    db.instructions.insert({"instruction": content})

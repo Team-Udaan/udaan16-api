@@ -71,10 +71,11 @@ class BaseHandler(RequestHandler):
             self.set_header("Access-Control-Allow-Methods", "*")
             self.set_header("Access-Control-Allow-Headers", "accept, authorization")
             self._status_code = 200
-            self.finish(json.dumps(dict(
+            data = json.dumps(dict(
                 code=status_code,
                 message=kwargs.get("exc_info").__str__()
-            )))
+            ))
+            self.finish(data)
 
     def set_result(self, result):
         self.result = result

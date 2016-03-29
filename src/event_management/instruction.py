@@ -7,7 +7,7 @@ class InstructionsHandler(BaseHandler):
     @coroutine
     def get(self, *args, **kwargs):
         db = self.settings["client"].udaan
-        result = yield db.instrunctions.find_one()
+        result = yield db.instructions.find_one()
         if result is not None:
             self.respond(result['instruction'], 200)
         else:
