@@ -29,6 +29,7 @@ define(name="instructions", default="instructions.md", help="give the file path 
 
 client = MotorClient()
 
+
 class Handle(BaseHandler):
     def get(self, *args, **kwargs):
         self.respond('OK', 200)

@@ -37,17 +37,15 @@ class ParticipantsHandler(BaseHandler):
         else:
             participants_cursor = self.db.participants.find({"round" + round_number: "q",
                                                             "eventName": self.result["eventName"]},
-                                                            {"_id": 1, "names": 1, "mobileNumber": 1, "smsStatus": 1})
-            count = 0
+                                                            {"_id": 1, "names": 1, "mobileNumber": 1,
+                                                             "smsStatus": 1, "receiptId": 1})
             while (yield participants_cursor.fetch_next):
                 participant = participants_cursor.next_object()
                 participant["_id"] = str(participant["_id"])
-                participant["receiptId"] = "TH" + str(count)
                 if "smsStatus" in participant:
                     participant["smsStatus"] = participant["smsStatus"]["status"]
                 else:
                     participant.setdefault("smsStatus", "NA")
-                count += 1
                 participants.append(participant)
             message = dict(
                 participants=participants,

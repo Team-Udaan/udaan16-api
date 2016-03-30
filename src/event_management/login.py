@@ -30,8 +30,6 @@ class LoginHandler(BaseHandler):
             if password == get_password(email):
                 token = result['_id']
                 token = token.__str__()
-                # TODO
-                # insert token into database
                 self.respond(token, 200)
             else:
                 self.respond("Invalid email id, password combination", 401)

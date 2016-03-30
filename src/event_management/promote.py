@@ -20,16 +20,14 @@ class PromoteHandler(BaseHandler):
            :param kwargs: """
 
         # TODO
-        # handle exceptions with transactions
+        # handle exceptions with transactions - will not arise
         try:
             validate_result = validator(self.parse_request_body())
             if validate_result is True:
                 if self.result["currentRound"] < 3:
                     if self.result["currentRound"] == self.get_json_body_argument("currentRound"):
                         teams = self.get_json_body_argument("teams")
-                        # TODO
-                        # make default False in production
-                        test = self.get_json_body_argument("test", default=True)
+                        test = self.get_json_body_argument("test", default=False)
                         numbers = [team["mobileNumber"] for team in teams]
                         numbers_str_list = ','.join(map(str, numbers))
                         round_number = str(int(self.result['currentRound']) + 1)

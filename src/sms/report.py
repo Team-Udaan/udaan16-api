@@ -20,8 +20,6 @@ class ReportHandler(BaseHandler):
         custom_id_list = str(data['customID']).split("_")
         str_id, round_number = custom_id_list[0], custom_id_list[1]
         _id = ObjectId(str_id)
-        # TODO
-        # remove this in production
         number = str(data['number'])[-10:]
         del data["number"], data["customID"]
         self.result = yield self.db.events.find_one({"_id": _id})
